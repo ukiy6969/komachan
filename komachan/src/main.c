@@ -5,18 +5,21 @@
 
 #include "header.h"
 
+int is_log_output; // is output logfile flag
+
 
 int main( int argc, char *argv[] )
 {
   int ret;
 
-  out(" %s  ver. %s  / revision %d\n\n", PROGRAM_NAME, VERSION, REVISION );
   is_log_output = 1;
   if (argc > 1) {
     if (strcmp(argv[1], "--no-logfile") == 0) {
       is_log_output = 0;
     }
   }
+
+  out(" %s  ver. %s  / revision %d\n\n", PROGRAM_NAME, VERSION, REVISION );
 
   if( starting_initialize() )
     { exit(1); }
