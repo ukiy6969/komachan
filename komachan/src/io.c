@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
-#ifndef _MSC_VER 
+#ifndef _MSC_VER
 #include <unistd.h>
 #endif
 #include <stdlib.h>
@@ -38,19 +38,19 @@ int cmd_prompt(){
     {
       out("White %d> ", N_PLY +1 );
     }
-  
+
   memset( buf, 0, sizeof(buf) );
   fgets( buf, sizeof( buf ), stdin );
   count_byte = strlen( buf );
   if( !strcmp( buf, "\n") )
     { return 0; }
-  
+
   buf[count_byte-1] = '\0';
-  
+
   token = strtok_r( buf, DELIM, &last );
   if( token == NULL )
     { return 0; }
-  
+
   if( !strcmp( token, "quit" ) )
     { return -1; }
   else if( !strcmp( token, "board" ) )
@@ -67,10 +67,10 @@ int cmd_prompt(){
     { out_record( 1 ); }
   else
     { ret = -1; }
-  
+
   if( ret == -1 )
     out(" Invalid command\n");
-  
+
   return 0;
 }
 
@@ -90,7 +90,7 @@ int out_record( int resign )
   sprintf(filename, "records/%04d_%02d_%02d_%02d%02d%02d.msk",
            date->tm_year +1900, date->tm_mon +1, date->tm_mday,
            date->tm_hour      , date->tm_min,    date->tm_sec);
-  
+
   fp = fopen(filename, "w");
   fp = fopen(filename, "w");
 
@@ -102,8 +102,8 @@ int out_record( int resign )
 
   out_file( fp, "\nV1_MSK\n\n" );
   out_file( fp, "\nPI\n+\n");
-  
-  
+
+
   for( i = 0; i < N_PLY; i++ )
     {
       str_CSA_move( str, history[ i ].move );
@@ -116,7 +116,7 @@ int out_record( int resign )
 
   if( resign )
     out_file( fp, "%%TORYO\n" );
-  
+
   fclose( fp );
 
   out( " %s has been output.\n", filename );
@@ -164,7 +164,7 @@ static void manual_move( char **last )
 {
   const char *p = strtok_r( NULL, DELIM, last );
   unsigned int move;
-  
+
   move = CSA2Internal( p );
   if( move == MOVE_NULL )
     {
@@ -190,7 +190,7 @@ void out_position()
   int nmove;
   nmove = gen_legalmoves( moves );
   out_legalmoves( moves, nmove );
-/*  
+/*
 #ifndef _MSC_VER
   // TODO:
   assert( isCorrect_Occupied() );
@@ -205,7 +205,7 @@ void out_legalmoves( unsigned int moves[], int count )
   char buf[8];
 
   out(" Legal Moves( %d ) =\n ", count);
-  
+
   for( i=0; i < count; i++)
     {
       str_CSA_move( buf, moves[ i ] );
@@ -244,7 +244,7 @@ void str_CSA_move( char *str, unsigned int move )
       snprintf( str, 7, "%d%d%d%d%s",
                 5-( from%5 ), ( from/5 +1 ),
                 5-( to%5),    ( to/5   +1 ),
-                ch_piece_csa[ type ] );    
+                ch_piece_csa[ type ] );
     }
   return;
 }
@@ -329,14 +329,14 @@ void out( const char *format, ... )
   fflush( stdout);
 
   if ( ( strchr( format, '\n' ) != NULL || strchr( format, '\r' ) == NULL )
-       && file_log != NULL )
+       && file_log != NULL  && is_log_output)
     {
       va_start( arg, format );
-      vfprintf( file_log, format, arg ); 
+      vfprintf( file_log, format, arg );
       va_end( arg );
       fflush( file_log );
     }
-  
+
   return;
 }
 
@@ -345,7 +345,7 @@ void out_file( FILE *fp, const char *format, ... )
   va_list arg;
 
   va_start( arg, format );
-  vfprintf( fp, format, arg ); 
+  vfprintf( fp, format, arg );
   va_end( arg );
   fflush( fp );
 
@@ -371,7 +371,7 @@ void out_board(){
         out(" %s%d", ch_piece[i], B_HAND(i) );
     }
   out("\n");
-  
+
   out("   5   4   3   2   1\n");
   for( i=0; i<5; i++ )
     {

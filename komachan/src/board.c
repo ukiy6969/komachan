@@ -52,7 +52,7 @@ int gen_legalmoves( unsigned int moves[] )
   unsigned int pin[32], attack_on_king;
   unsigned int att;
   int nmove = 0;
-  
+
   if( TURN )
     {
       pinInfo_b( pin );
@@ -82,7 +82,7 @@ int gen_legalmoves( unsigned int moves[] )
         nmove = gen_nocap_w( moves, nmove, pin );
       }
     }
-  
+
   return nmove;
 }
 
@@ -106,7 +106,7 @@ int gen_evasion_w( unsigned int moves[], int count, int nAttacks,
       dests ^= Bit( to );
     }
   Occupied0   ^= Bit( SQ_W_KING );
-  
+
   if( nAttacks >= 2 )
     { return count; }
 
@@ -156,7 +156,7 @@ int gen_evasion_w( unsigned int moves[], int count, int nAttacks,
               DROP( bishop );
               DROP( rook );
             }
-          
+
           count = gen_attacks_to_w( moves, count, to, 0, pin );
 
           dests ^= Bit( to );
@@ -173,7 +173,7 @@ int gen_evasion_w( unsigned int moves[], int count, int nAttacks,
                 * Attack_Bishop_magic[ SQ_W_KING ])
                >> Attack_Bishop_shift[ SQ_W_KING ]) & mask_magic;
       dests &= Attack_Bishop[ SQ_W_KING ][ index ];
-      
+
       assert( dests );
 
       while( (to = FirstOne( dests )) != -1 )
@@ -184,7 +184,7 @@ int gen_evasion_w( unsigned int moves[], int count, int nAttacks,
                 {
                   int dp = FirstOne( BB_W_PAWN );
                   if( dp < 0 || Bit(to) & ~DoublePawn[ dp ] )
-                    { 
+                    {
                       moves[ count ] = MOVE( w_pawn, move_drop, to, 0, 0 );
                       count ++;
                     }
@@ -194,7 +194,7 @@ int gen_evasion_w( unsigned int moves[], int count, int nAttacks,
               DROP( bishop );
               DROP( rook );
             }
-          
+
           count = gen_attacks_to_w( moves, count, to, 0, pin );
 
           dests ^= Bit( to );
@@ -202,7 +202,7 @@ int gen_evasion_w( unsigned int moves[], int count, int nAttacks,
     }
 
 #undef DROP
-  
+
   return count;
 }
 
@@ -226,11 +226,11 @@ int gen_evasion_b( unsigned int moves[], int count, int nAttacks,
       dests ^= Bit( to );
     }
   Occupied0   ^= Bit( SQ_B_KING );
-  
+
   if( nAttacks >= 2 )
     { return count; }
 
-  
+
   int sq = FirstOne( attack_pieces );
   assert( sq >= 0 );
   count = gen_attacks_to_b( moves, count, sq, 1, pin );
@@ -255,9 +255,9 @@ int gen_evasion_b( unsigned int moves[], int count, int nAttacks,
                 * Attack_Rook_magic[ SQ_B_KING ])
                >> Attack_Rook_shift[ SQ_B_KING ]) & mask_magic;
       dests &= Attack_Rook[ SQ_B_KING ][ index ];
-      
+
       assert( dests );
-      
+
       while( (to = FirstOne( dests )) != -1 )
         {
           if( B_HAND_A )
@@ -266,7 +266,7 @@ int gen_evasion_b( unsigned int moves[], int count, int nAttacks,
                 {
                   int dp = FirstOne( BB_B_PAWN );
                   if( dp < 0 || Bit(to) & ~DoublePawn[ dp ] )
-                    { 
+                    {
                       moves[ count ] = MOVE( b_pawn, move_drop, to, 0, 0 );
                       count ++;
                     }
@@ -276,7 +276,7 @@ int gen_evasion_b( unsigned int moves[], int count, int nAttacks,
               DROP( bishop );
               DROP( rook );
             }
-          
+
           count = gen_attacks_to_b( moves, count, to, 0, pin );
 
           dests ^= Bit( to );
@@ -293,7 +293,7 @@ int gen_evasion_b( unsigned int moves[], int count, int nAttacks,
                 * Attack_Bishop_magic[ SQ_B_KING ])
                >> Attack_Bishop_shift[ SQ_B_KING ]) & mask_magic;
       dests &= Attack_Bishop[ SQ_B_KING ][ index ];
-      
+
       assert( dests );
 
       while( (to = FirstOne( dests )) != -1 )
@@ -304,7 +304,7 @@ int gen_evasion_b( unsigned int moves[], int count, int nAttacks,
                 {
                   int dp = FirstOne( BB_B_PAWN );
                   if( dp < 0 || Bit(to) & ~DoublePawn[ dp ] )
-                    { 
+                    {
                       moves[ count ] = MOVE( b_pawn, move_drop, to, 0, 0 );
                       count ++;
                     }
@@ -314,7 +314,7 @@ int gen_evasion_b( unsigned int moves[], int count, int nAttacks,
               DROP( bishop );
               DROP( rook );
             }
-          
+
           count = gen_attacks_to_b( moves, count, to, 0, pin );
 
           dests ^= Bit( to );
@@ -322,7 +322,7 @@ int gen_evasion_b( unsigned int moves[], int count, int nAttacks,
     }
 
 #undef DROP
-  
+
   return count;
 }
 
@@ -333,7 +333,7 @@ int mate_by_dropping_pawn_w( int sq )
   unsigned int dests, att;
   int to;
   unsigned int moves[ SIZE_LEGALMOVES ];
-  
+
   dests = Attack_King[ SQ_B_KING ] & nOccupiedB;
 
   /* not necessary to assume king's absence 'cause the king cannot
@@ -366,7 +366,7 @@ int mate_by_dropping_pawn_b( int sq )
   unsigned int dests, att;
   int to;
   unsigned int moves[ SIZE_LEGALMOVES ];
-  
+
   dests = Attack_King[ SQ_W_KING ] & nOccupiedW;
 
   /* not necessary to assume king's absence 'cause the king cannot
@@ -436,7 +436,7 @@ int gen_attacks_to_w( unsigned int moves[], int count, int sq, int cap, unsigned
         count ++; }
       dests ^= Bit( from );
     }
-  
+
   dests  = Attack_BGold[ sq ] & BB_W_GOLD;
   GEN_ATTACK( w_gold, 0 );
 
@@ -522,7 +522,7 @@ int gen_attacks_to_b( unsigned int moves[], int count, int sq, int cap, unsigned
         count ++; }
       dests ^= Bit( from );
     }
-  
+
   dests  = Attack_WGold[ sq ] & BB_B_GOLD;
   GEN_ATTACK( b_gold, 0 );
 
@@ -586,13 +586,13 @@ int attacks_to_w( int sq, unsigned int *attack_pieces )
   att |= Attack_Bishop[ sq ][ index ] & ( BB_W_BISHOP | BB_W_HORSE );
 
   *attack_pieces = att;
-  
+
   while( (from = FirstOne(att)) != -1 )
     {
       count ++;
       att ^= Bit( from );
     }
-  
+
   return count;
 }
 
@@ -617,13 +617,13 @@ int attacks_to_b( int sq, unsigned int *attack_pieces )
   att |= Attack_Bishop[ sq ][ index ] & ( BB_B_BISHOP | BB_B_HORSE );
 
   *attack_pieces = att;
-  
+
   while( (from = FirstOne(att)) != -1 )
     {
       count ++;
       att ^= Bit( from );
     }
-  
+
   return count;
 }
 
@@ -656,7 +656,7 @@ void pinInfo_w( unsigned int pin[] ){
         |= Pin_Bishop[pIndex][sq][index][1];
       bb ^= Bit( pIndex );
     }
-  
+
   return;
 }
 
@@ -687,8 +687,8 @@ void pinInfo_b( unsigned int pin[] ){
       pin[ Pin_Bishop[pIndex][sq][index][0] ]
         |= Pin_Bishop[pIndex][sq][index][1];
       bb ^= Bit( pIndex );
-    }  
-  
+    }
+
   return;
 }
 
@@ -708,7 +708,7 @@ int gen_drop_w( unsigned int moves[], int count )
           dests ^= Bit( to );
         }
     }
-  
+
   if( IsHand_W( silver ) )
     {
       dests = ~Occupied0 & bb_mask;
@@ -719,7 +719,7 @@ int gen_drop_w( unsigned int moves[], int count )
           dests ^= Bit( to );
         }
     }
-  
+
   if( IsHand_W( bishop) )
     {
       dests = ~Occupied0 & bb_mask;
@@ -741,14 +741,14 @@ int gen_drop_w( unsigned int moves[], int count )
           dests ^= Bit( to );
         }
     }
-  
+
   if( IsHand_W( pawn ) )
     {
       dests = ~Occupied0 & bb_mask & ~b1_1111;
       to = FirstOne( BB_W_PAWN );
       if( to >= 0 )
         { dests &= ~DoublePawn[ to ]; }
-      
+
       while( (to = FirstOne(dests)) != -1 )
         {
           if( to == SQ_B_KING + 5 &&  /* test "mate by dropping pawn" */
@@ -781,7 +781,7 @@ int gen_drop_b( unsigned int moves[], int count )
           dests ^= Bit( to );
         }
     }
-  
+
   if( IsHand_B( silver ) > 0 )
     {
       dests = ~Occupied0 & bb_mask;
@@ -793,7 +793,7 @@ int gen_drop_b( unsigned int moves[], int count )
         }
     }
 
-  
+
   if( IsHand_B( bishop ) )
     {
       dests = ~Occupied0 & bb_mask;
@@ -815,7 +815,7 @@ int gen_drop_b( unsigned int moves[], int count )
           dests ^= Bit( to );
         }
     }
-  
+
   if( IsHand_B( pawn ) )
     {
       dests = ~Occupied0 & bb_mask & ~( b1_1111 << 20 );
@@ -826,7 +826,7 @@ int gen_drop_b( unsigned int moves[], int count )
       while( (to = FirstOne(dests)) != -1 )
         {
           if( to == SQ_W_KING - 5 &&  /* test "mate by dropping pawn" */
-              mate_by_dropping_pawn_b( to ) ) 
+              mate_by_dropping_pawn_b( to ) )
             {
               dests ^= Bit( to );
               continue;
@@ -836,7 +836,7 @@ int gen_drop_b( unsigned int moves[], int count )
           dests ^= Bit( to );
         }
     }
-  
+
   return count;
 }
 
@@ -845,7 +845,7 @@ int gen_cap_w( unsigned int moves[], int count, unsigned int pin[] )
   /* ret: number of total moves */
   unsigned int dests, bb, att;
   int from, to, index;
-  
+
   bb = BB_W_PAWN;
   while( (from = FirstOne(bb)) != -1 )
     {
@@ -1001,7 +1001,7 @@ int gen_cap_w( unsigned int moves[], int count, unsigned int pin[] )
         }
       bb ^= Bit( from );
     }
-  
+
   dests = Attack_King[ SQ_W_KING ] & ~nOccupiedB;
   while( (to = FirstOne( dests )) != -1 )
     {
@@ -1022,7 +1022,7 @@ int gen_cap_b( unsigned int moves[], int count, unsigned int pin[] )
   /* ret: number of total moves */
   unsigned int dests, bb, att;
   int from, to, index;
-  
+
   bb = BB_B_PAWN;
   while( (from = FirstOne(bb)) != -1 )
     {
@@ -1053,7 +1053,7 @@ int gen_cap_b( unsigned int moves[], int count, unsigned int pin[] )
         }
       bb ^= Bit( from );
     }
-  
+
   bb = BB_B_SILVER;
   while( (from = FirstOne(bb)) != -1 )
     {
@@ -1178,7 +1178,7 @@ int gen_cap_b( unsigned int moves[], int count, unsigned int pin[] )
         }
       bb ^= Bit( from );
     }
-  
+
   dests = Attack_King[ SQ_B_KING ] & ~nOccupiedW;
   while( (to = FirstOne( dests )) != -1 )
     {
@@ -1189,7 +1189,7 @@ int gen_cap_b( unsigned int moves[], int count, unsigned int pin[] )
         }
       dests ^= Bit( to );
     }
-  
+
   return count;
 }
 
@@ -1234,7 +1234,7 @@ int gen_nocap_w( unsigned int moves[], int count, unsigned int pin[] )
         }
       bb ^= Bit( from );
     }
-  
+
   bb = BB_W_SILVER;
   while( (from = FirstOne(bb)) != -1 )
     {
@@ -1338,7 +1338,7 @@ int gen_nocap_w( unsigned int moves[], int count, unsigned int pin[] )
         }
       bb ^= Bit( from );
     }
-  
+
   bb = BB_W_PAWN;
   while( (from = FirstOne(bb)) != -1 )
     {
@@ -1355,7 +1355,7 @@ int gen_nocap_w( unsigned int moves[], int count, unsigned int pin[] )
         }
       bb ^= Bit( from );
     }
-  
+
   dests = Attack_King[ SQ_W_KING ] & ~Occupied0;
   while( (to = FirstOne( dests )) != -1 )
     {
@@ -1366,7 +1366,7 @@ int gen_nocap_w( unsigned int moves[], int count, unsigned int pin[] )
         }
       dests ^= Bit( to );
     }
-  
+
   return count;
 }
 
@@ -1410,7 +1410,7 @@ int gen_nocap_b( unsigned int moves[], int count, unsigned int pin[]  )
         }
       bb ^= Bit( from );
     }
-  
+
   bb = BB_B_SILVER;
   while( (from = FirstOne(bb)) != -1 )
     {
@@ -1514,7 +1514,7 @@ int gen_nocap_b( unsigned int moves[], int count, unsigned int pin[]  )
         }
       bb ^= Bit( from );
     }
-  
+
   bb = BB_B_PAWN;
   while( (from = FirstOne(bb)) != -1 )
     {
@@ -1531,7 +1531,7 @@ int gen_nocap_b( unsigned int moves[], int count, unsigned int pin[]  )
         }
       bb ^= Bit( from );
     }
-  
+
   dests = Attack_King[ SQ_B_KING ] & ~Occupied0;
   while( (to = FirstOne( dests )) != -1 )
     {
@@ -1548,7 +1548,7 @@ int gen_nocap_b( unsigned int moves[], int count, unsigned int pin[]  )
 
 
 void make_move_w( unsigned int move )
-{  
+{
   const int from    = MOVE_FROM( move );
   const int to      = MOVE_TO( move );
   const int type    = MOVE_TYPE( move );
@@ -1562,7 +1562,7 @@ void make_move_w( unsigned int move )
     {
       W_HAND_A -= HAND_ADD( type );
       BB_N( type ) |= Bit( to );
-      
+
       nOccupiedW ^= Bit( to );
       Occupied0  ^= Bit( to );
 
@@ -1634,7 +1634,7 @@ void make_move_b( unsigned int move )
   const int promote = move & move_mask_promote;
   const int cap     = move & move_mask_capture;
   int cap_type = 0;
-  
+
   assert( type >= 16 );
 
   if( from == move_drop )
@@ -1693,7 +1693,7 @@ void make_move_b( unsigned int move )
     }
   SQ_B_KING = FirstOne( BB_B_KING );
   assert( SQ_B_KING >= 0 );
-  
+
   history[N_PLY].move =
     ( move & ~move_mask_captured ) + CAPTURED_2_MOVE( cap_type );
 
@@ -1708,7 +1708,7 @@ void unmake_move_w()
   FLIP_TURN;
   N_PLY --;
   int move = history[N_PLY].move;
-  
+
   const int from     = MOVE_FROM( move );
   const int to       = MOVE_TO( move );
   const int type     = MOVE_TYPE( move );
@@ -1775,7 +1775,7 @@ void unmake_move_b()
   FLIP_TURN;
   N_PLY --;
   int move = history[N_PLY].move;
-  
+
   const int from     = MOVE_FROM( move );
   const int to       = MOVE_TO( move );
   const int type     = MOVE_TYPE( move );
@@ -1786,7 +1786,7 @@ void unmake_move_b()
     {
       B_HAND_A += HAND_ADD( type & mask_nopro );
       BB_N( type ) ^= Bit( to );
-      
+
       nOccupiedB ^= Bit( to );
       Occupied0  ^= Bit( to );
     }
@@ -1860,7 +1860,7 @@ int get_piece_on_sq_w( int sq )
   TEST( w_pro_pawn );
   if( SQ_W_KING == sq )
     return w_king;
-  
+
   return no_piece;
 }
 
@@ -1885,7 +1885,7 @@ int get_piece_on_sq_b( int sq )
 int get_piece_on_sq( int sq )
 {
   int ret;
-  
+
   if( (ret = get_piece_on_sq_w( sq )) != no_piece )
     { return ret; }
 
@@ -1903,7 +1903,7 @@ int starting_initialize()
     return -1: failed
             0: succeeded
    */
-  
+
   FILE *fp;
 
   fp = fopen("BB_Attack.bin","rb");
@@ -1924,7 +1924,7 @@ int starting_initialize()
   FILE_READ( DoublePawn, 32 );
   FILE_READ( Pin_Rook, 32 * 32 * 64 * 2 );
   FILE_READ( Pin_Bishop, 32 * 32 * 64 * 2 );
-  
+
   fclose( fp );
 
   return 0;
@@ -1966,14 +1966,14 @@ void clear_game()
   BB_B_DRAGON     = 0;
 
   calc_occupied_sq();
-  
+
   return;
 }
 
 void calc_occupied_sq()
-{  
+{
   int i,index, tmp;
-  
+
   nOccupiedW = bb_mask;
   nOccupiedB = bb_mask;
   Occupied0  = 0;
@@ -2010,7 +2010,7 @@ int popuCount( int piece )
   int count = 0;
   unsigned bb = BB_N( piece );
   int b;
-  
+
   while( ( b = FirstOne( bb ) ) != -1 )
     {
       count ++;
@@ -2022,11 +2022,10 @@ int popuCount( int piece )
 
 int get_turn()
 {
-  return TURN ? black : white ; 
+  return TURN ? black : white ;
 }
 
 int get_nply()
 {
   return N_PLY;
 }
-

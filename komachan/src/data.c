@@ -15,4 +15,3 @@ const char *ch_piece2[32] =
 const char *ch_piece_csa[16] =
 { "--", "FU", "--", "--", "GI", "KI", "KA", "HI",
   "OU", "TO", "--", "--", "NG", "--", "UM", "RY" };
-

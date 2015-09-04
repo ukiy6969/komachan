@@ -36,7 +36,7 @@ void game_initialize()
 void game_finalize()
 {
   int iret;
-  
+
   if( file_log )
     { iret = fclose( file_log ); }
 
