@@ -11,7 +11,7 @@ void game_initialize()
 
   game_finalize();
   clear_game();
-  
+
   char str_file[ SIZE_FILENAME ];
   for ( i = 0; i < 1000; i++ )
     {
