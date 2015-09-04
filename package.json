@@ -1,0 +1,28 @@
+{
+  "name": "komachan",
+  "version": "1.0.0",
+  "description": "gogoShogi game client",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ukiy/komachan.git"
+  },
+  "keywords": [
+    "js"
+  ],
+  "author": "ukiy",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ukiy/komachan/issues"
+  },
+  "homepage": "https://github.com/ukiy/komachan#readme",
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-coffee": "^2.3.1",
+    "gulp-util": "^3.0.6",
+    "require-dir": "^0.3.0"
+  }
+}
