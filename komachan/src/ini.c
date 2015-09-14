@@ -27,7 +27,7 @@ void game_initialize()
         }
     }
 
-  if( i >= 0 )
+  if( i >= 0 && is_log_output)
     { file_log = fopen( str_file, "w" ); }
 
   return;
@@ -36,7 +36,7 @@ void game_initialize()
 void game_finalize()
 {
   int iret;
-  
+
   if( file_log )
     { iret = fclose( file_log ); }
 

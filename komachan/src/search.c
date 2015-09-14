@@ -27,8 +27,8 @@ int search_root()
       return -2;
     }
 
-  out( " Root move generation -> %d moves.\n", nmove );
-  
+  //out( " Root move generation -> %d moves.\n", nmove );
+
   if( nmove <= 1 )
     {
       best = 0;
@@ -38,19 +38,19 @@ int search_root()
   best = 0;
   max   = -SCORE_MAX;
   beta  = SCORE_MAX;
-  
+
   for( imove = 0; imove < nmove; imove++ )
     {
       MAKE_MOVE( legalmoves[ imove ] );
       value = -search( -beta, -max, depth -1, 1 );
       UNMAKE_MOVE;
-      
+
       if( value > max )
         {
           max = value;
           best = imove;
         }
-      
+
     }
 
   MAKE_MOVE( legalmoves[ best ] );
@@ -61,28 +61,28 @@ int search( short alpha, short beta, int depth, int ply )
 {
   int imove;
   short value;
-  short max = -SCORE_MAX;  
+  short max = -SCORE_MAX;
   int nmove;
 
   unsigned int legalmoves[ SIZE_LEGALMOVES ];
-  
+
   if( depth <= 0 )
     {
       return evaluate();
     }
-  
+
   nmove = gen_legalmoves( legalmoves );
-  
+
   if( nmove == 0 )
     { return SCORE_MATED + ply; }
-  
+
   max = alpha;
   for( imove = 0; imove < nmove; imove++ )
     {
       MAKE_MOVE( legalmoves[ imove ] );
       value = -search( -beta, -max, depth -1, ply +1 );
       UNMAKE_MOVE;
-      
+
       if( value >= beta )
         {
           return value;
@@ -91,7 +91,7 @@ int search( short alpha, short beta, int depth, int ply )
         {
           max = value;
         }
-      
+
     }
 
   return max;
@@ -116,6 +116,6 @@ short evaluate()
   score += ( W_HAND( gold )   - B_HAND( gold ) )   * 370;
   score += ( W_HAND( bishop ) - B_HAND( bishop ) ) * 340;
   score += ( W_HAND( rook )   - B_HAND( rook ) )   * 390;
-  
+
   return get_turn() ? -score: score;
 }

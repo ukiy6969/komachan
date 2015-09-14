@@ -16,6 +16,8 @@ extern const char *ch_piece[16];
 extern const char *ch_piece2[32];
 extern const char *ch_piece_csa[16];
 extern FILE *file_log;
+extern int is_log_output;
+extern int server_mode;
 
 /* main.c */
 void close_program();
@@ -26,10 +28,13 @@ void out( const char *format, ... );
 void out_file( FILE *fp, const char *format, ... );
 void out_position();
 void out_board();
+int manual_move_str(char *str);
 void out_legalmoves( unsigned int moves[], int count );
 void str_CSA_move( char *buf, unsigned int move );
 unsigned int  CSA2Internal( const char *str );
 int out_record( int resign );
+void out_server();
+void out_move_string(char* str);
 
 /* ini.c */
 void game_initialize();
