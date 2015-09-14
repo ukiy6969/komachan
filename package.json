@@ -1,7 +1,8 @@
 {
   "name": "komachan",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "gogoShogi game client",
+  "private": false,
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -23,6 +24,10 @@
     "gulp": "^3.9.0",
     "gulp-coffee": "^2.3.1",
     "gulp-util": "^3.0.6",
+    "node-gyp": "^3.0.3",
     "require-dir": "^0.3.0"
+  },
+  "dependencies": {
+    "socket.io-client": "^1.3.6"
   }
 }

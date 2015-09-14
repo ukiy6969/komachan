@@ -30,11 +30,11 @@ int cmd_prompt(){
   char *last;
   int count_byte, ret;
 
-  if( TURN )
+  if( TURN && !server_mode)
     {
       out("Black %d> ", N_PLY +1 );
     }
-  else
+  else if(!server_mode)
     {
       out("White %d> ", N_PLY +1 );
     }
@@ -59,12 +59,17 @@ int cmd_prompt(){
     { back(); }
   else if( !strcmp( token, "move" ) )
     { manual_move( &last ); }
-  else if( !strcmp( token, "search" ) || !strcmp( token, "s" ) )
+  else if( !server_mode && !strcmp( token, "search" ) || !strcmp( token, "s" ) )
     { search_start(); }
   else if( !strcmp( token, "new" )  )
     { new_game(); }
   else if( !strcmp( token, "record" )  )
     { out_record( 1 ); }
+  else if( server_mode && !strcmp(token, "search") )
+    {
+      search_start();
+      out_server();
+    }
   else
     { ret = -1; }
 
@@ -180,8 +185,22 @@ static void manual_move( char **last )
 
 }
 
+int manual_move_str( char *str){
+  unsigned int move;
+  move = CSA2Internal(str);
+  if( move == MOVE_NULL )
+    {
+      return -1;
+    }
+  MAKE_MOVE( move );
+  return 0;
+}
+
 void out_position()
 {
+  if(server_mode) {
+    return;
+  }
   out("\n");
   out_board();
   out(" Root position evaluation = %d\n", evaluate() );
@@ -355,6 +374,11 @@ void out_file( FILE *fp, const char *format, ... )
 void out_board(){
   int i, j, index, type;
 
+  if (server_mode) {
+    out_server();
+    return;
+  }
+
   if( TURN )
     {
       out("[ %d 手目 後手 ]\n", N_PLY +1 );
@@ -420,4 +444,15 @@ void out_board(){
   out("\n\n");
 
   return;
+}
+
+void out_server(){
+  char str[8];
+  str_CSA_move( str, history[ N_PLY - 1].move );
+  out("%s\n", str);
+  return;
+}
+
+void out_move_string(char* str){
+  str_CSA_move( str, history[ N_PLY - 1].move );
 }

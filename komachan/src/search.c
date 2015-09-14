@@ -27,7 +27,7 @@ int search_root()
       return -2;
     }
 
-  out( " Root move generation -> %d moves.\n", nmove );
+  //out( " Root move generation -> %d moves.\n", nmove );
 
   if( nmove <= 1 )
     {

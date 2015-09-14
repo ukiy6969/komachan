@@ -1,13 +1,20 @@
 spawn = require('child_process').spawn
-koma = spawn './komachan/bin/komachan'
+client = require 'socket.io-client'
+io = client.connect 'http://localhost:3000'
+koma = spawn './komachan/bin/komachan', ['--server-mode']
+game = null
 
-koma.stdout.on 'data', (data) ->
-  process.stdout.write do data.toString
+io.emit 'komachan', {}
 
-koma.stdout.on 'end',  ->
-  console.log 'end'
+io.on 'confirm', (data)->
+  game = data
+  io.emit 'agree', {user: 'komachan'}
 
-setTimeout( ->
-  console.log 'write'
-  koma.stdin.write 'search\n'
-, 1000)
+io.on 'start', (data)=>
+  console.log 'start', game
+  if(game.header.firstMove == 'koma')
+    console.log 'write'
+    koma.stdin.write 'search\n'
+
+koma.stdout.on 'data', (data)->
+  console.log 'koma', data.toString()

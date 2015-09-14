@@ -6,6 +6,7 @@
 #include "header.h"
 
 int is_log_output; // is output logfile flag
+int server_mode;  // server_mode
 
 
 int main( int argc, char *argv[] )
@@ -17,9 +18,15 @@ int main( int argc, char *argv[] )
     if (strcmp(argv[1], "--no-logfile") == 0) {
       is_log_output = 0;
     }
+    if (strcmp(argv[1], "--server-mode") == 0){
+      is_log_output = 0;
+      server_mode = 1;
+    }
   }
 
-  out(" %s  ver. %s  / revision %d\n\n", PROGRAM_NAME, VERSION, REVISION );
+  if (!server_mode) {
+    out(" %s  ver. %s  / revision %d\n\n", PROGRAM_NAME, VERSION, REVISION );
+  }
 
   if( starting_initialize() )
     { exit(1); }
