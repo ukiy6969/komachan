@@ -19,6 +19,7 @@
   "bugs": {
     "url": "https://github.com/ukiy/komachan/issues"
   },
+  "gpyfile": true,
   "homepage": "https://github.com/ukiy/komachan#readme",
   "devDependencies": {
     "gulp": "^3.9.0",
