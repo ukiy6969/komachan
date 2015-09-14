@@ -3,13 +3,13 @@
         {
             "target_name": "gogoshogi",
             "sources": [
-                "komachan/src/main.cc",
-                "komachan/src/board.c",
-                "komachan/src/data.c",
-                "komachan/src/ini.c",
-                "komachan/src/io.c",
-                "komachan/src/search.c",
-                "komachan/src/main.c"
+                "src/main.cc",
+                "src/board.c",
+                "src/data.c",
+                "src/ini.c",
+                "src/io.c",
+                "src/search.c",
+                "src/main.c"
             ]
         }
     ]

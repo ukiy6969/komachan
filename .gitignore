@@ -3,3 +3,4 @@ bin
 log
 record
 node_modules
+build
