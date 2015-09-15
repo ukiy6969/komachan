@@ -1,5 +1,4 @@
 var util = require('../lib/util');
-var ctrl = require('../lib/gogoshogi.controller');
 var Komachan = require('../lib/komachan');
 
 var koma1 = new Komachan();
