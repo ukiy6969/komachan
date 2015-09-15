@@ -1,1 +1,6 @@
-module.exports = require('build/Release/gogoshogi');
+var Komachan = require('./lib/komachan');
+module.exports = {
+  komachan: function(){
+    return new Komachan();
+  }
+}

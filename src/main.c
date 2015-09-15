@@ -18,7 +18,7 @@ int main( int argc, char *argv[] )
     if (strcmp(argv[1], "--no-logfile") == 0) {
       is_log_output = 0;
     }
-    if (strcmp(argv[1], "--server-mode") == 0){
+    if (strcmp(argv[2], "--server-mode") == 0){
       is_log_output = 0;
       server_mode = 1;
     }

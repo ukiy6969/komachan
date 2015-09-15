@@ -61,6 +61,12 @@ void Move(const FunctionCallbackInfo<Value>& args){
   args.GetReturnValue().Set(String::NewFromUtf8(isolate, str1));
 }
 
+void Board(const FunctionCallbackInfo<Value>& args){
+  Isolate* isolate = args.GetIsolate();
+  out_board();
+  args.GetReturnValue().Set(String::NewFromUtf8(isolate, "board"));
+}
+
 void Method(const FunctionCallbackInfo<Value>& args) {
   Isolate* isolate = args.GetIsolate();
   args.GetReturnValue().Set(String::NewFromUtf8(isolate, "world"));
@@ -71,6 +77,7 @@ void init(Local<Object> exports) {
   NODE_SET_METHOD(exports, "start", Start);
   NODE_SET_METHOD(exports, "search", Search);
   NODE_SET_METHOD(exports, "move", Move);
+  NODE_SET_METHOD(exports, "board", Board);
 }
 
 NODE_MODULE(addon, init)
