@@ -11,16 +11,23 @@ int server_mode;  // server_mode
 
 int main( int argc, char *argv[] )
 {
-  int ret;
+  int ret,i;
+  char* bin_path = "BB_Attack.bin";
 
   is_log_output = 1;
   if (argc > 1) {
-    if (strcmp(argv[1], "--no-logfile") == 0) {
-      is_log_output = 0;
-    }
-    if (strcmp(argv[2], "--server-mode") == 0){
-      is_log_output = 0;
-      server_mode = 1;
+    for(i=1; i<argc; i++){
+      if (strcmp(argv[i], "--no-logfile") == 0) {
+        is_log_output = 0;
+      }
+      if (strcmp(argv[i], "--server-mode") == 0){
+        is_log_output = 0;
+        server_mode = 1;
+      }
+      if (strstr(argv[i], "--bin-path=") != NULL){
+        strtok(argv[i], "=");
+        bin_path = strtok(NULL, "");
+      }
     }
   }
 
@@ -28,7 +35,7 @@ int main( int argc, char *argv[] )
     out(" %s  ver. %s  / revision %d\n\n", PROGRAM_NAME, VERSION, REVISION );
   }
 
-  if( starting_initialize() )
+  if( starting_initialize(bin_path) )
     { exit(1); }
   game_initialize();
 

@@ -238,7 +238,7 @@ extern unsigned int DoublePawn[32];
 //ここからライブラリの用意する関数群
 
 //ゲーム状態の変更
-int starting_initialize(); //利き情報の初期化
+int starting_initialize(char* bin_path); //利き情報の初期化
 void clear_game(); //盤面・手番・持ち駒を初期状態にリセット
 void make_move_w( unsigned int move );
 void make_move_b( unsigned int move );

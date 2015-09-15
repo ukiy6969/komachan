@@ -1897,7 +1897,7 @@ int get_piece_on_sq( int sq )
     printf(" fread \"%s\" failed.\n", #variable); \
     fclose( fp ); return -1; }\
 
-int starting_initialize()
+int starting_initialize(char* bin_path)
 {
   /*
     return -1: failed
@@ -1905,8 +1905,12 @@ int starting_initialize()
    */
 
   FILE *fp;
+  char* path = "BB_Attack.bin";
 
-  fp = fopen("BB_Attack.bin","rb");
+  if(bin_path != NULL){
+    path = bin_path;
+  }
+  fp = fopen(path,"rb");
 
   FILE_READ( Attack_WPawn, 32 );
   FILE_READ( Attack_WSilver, 32 );
