@@ -1,6 +1,6 @@
 {
   "name": "komachan",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "gogoShogi game client",
   "private": false,
   "main": "index.js",
@@ -19,7 +19,6 @@
   "bugs": {
     "url": "https://github.com/ukiy/komachan/issues"
   },
-  "gpyfile": false,
   "homepage": "https://github.com/ukiy/komachan#readme",
   "devDependencies": {},
   "dependencies": {
