@@ -19,7 +19,7 @@
   "bugs": {
     "url": "https://github.com/ukiy/komachan/issues"
   },
-  "gpyfile": true,
+  "gpyfile": false,
   "homepage": "https://github.com/ukiy/komachan#readme",
   "devDependencies": {},
   "dependencies": {
