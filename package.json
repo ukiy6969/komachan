@@ -1,6 +1,6 @@
 {
   "name": "komachan",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "gogoShogi game client",
   "private": false,
   "main": "index.js",
