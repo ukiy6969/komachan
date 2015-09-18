@@ -1,6 +1,6 @@
 {
   "name": "komachan",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "gogoShogi game client",
   "private": false,
   "main": "index.js",
@@ -23,6 +23,6 @@
   "homepage": "https://github.com/ukiy/komachan#readme",
   "devDependencies": {},
   "dependencies": {
-    "lodash": "^3.10.1",
+    "lodash": "^3.10.1"
   }
 }

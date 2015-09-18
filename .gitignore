@@ -7,3 +7,4 @@ build
 binding.gyp
 src/ccfiles
 test
+**/*.log
