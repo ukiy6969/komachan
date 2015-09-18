@@ -17,11 +17,30 @@ const char *ch_piece_csa[16] =
   "OU", "TO", "--", "--", "NG", "--", "UM", "RY" };
 
 Io::Io(Game* g){
+  int i,iret;
   server_mode = 0;
-  is_log_output = 0;
+  is_log_output = 1;
   game = g;
   board = game->get_board();
   search = game->get_search();
+
+  char str_file[ SIZE_FILENAME ];
+  for ( i = 0; i < 1000; i++ )
+    {
+      snprintf( str_file, SIZE_FILENAME, "log/game%03d.log", i );
+      file_log = fopen( str_file, "r" );
+      if ( file_log == NULL ) { break; }
+      iret = fclose( file_log );
+      if ( iret < 0 )
+        {
+          file_log = NULL;
+          i = -1;
+          break;
+        }
+    }
+
+  if( i >= 0 && is_log_output)
+    { file_log = fopen( str_file, "w" ); }
 }
 
 Board* Io::get_board(){

@@ -5,13 +5,26 @@ void close_program(Game* game);
 int main( int argc, char *argv[] )
 {
   int ret;
+  char* bin_path;
   Game* game = new Game();
   Io* io = new Io(game);
   Board* board = io->get_board();
 
-  board->starting_initialize();
-  //if( io->get_board()->starting_initialize() )
-  //  { exit(1); }
+  if (argc > 1) {
+    for(int i=1; i<argc; i++){
+      if (strcmp(argv[i], "--no-logfile") == 0) {
+      }
+      if (strcmp(argv[i], "--server-mode") == 0){
+      }
+      if (strstr(argv[i], "--bin-path=") != NULL){
+        strtok(argv[i], "=");
+        bin_path = strtok(NULL, "");
+      }
+    }
+  }
+
+  if( io->get_board()->starting_initialize(bin_path) < 0 )
+    { exit(1); }
   game->game_initialize();
 
   io->out_position();

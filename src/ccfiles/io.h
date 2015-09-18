@@ -7,7 +7,6 @@
 #include <time.h>
 #include <assert.h>
 
-#define SIZE_FILENAME        64
 //#include "header.h"
 class Io{
 private:
@@ -20,6 +19,7 @@ private:
 public:
   Io(Game* g);
   Board* get_board();
+  static const int SIZE_FILENAME = 64;
   int cmd_prompt();
   int out_record(int resign);
   void new_game();

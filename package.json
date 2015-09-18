@@ -5,6 +5,7 @@
   "private": false,
   "main": "index.js",
   "scripts": {
+    "install": ""
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -23,6 +24,5 @@
   "devDependencies": {},
   "dependencies": {
     "lodash": "^3.10.1",
-    "require-reload": "^0.2.2"
   }
 }

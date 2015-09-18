@@ -1873,7 +1873,7 @@ int Board::get_piece_on_sq( int sq )
     printf(" fread \"%s\" failed.\n", #variable); \
     fclose( fp ); return -1; }\
 
-int Board::starting_initialize()
+int Board::starting_initialize(char* bin_path)
 {
   /*
     return -1: failed
@@ -1881,8 +1881,16 @@ int Board::starting_initialize()
    */
 
   FILE *fp;
+  char* path = "BB_Attack.bin";
+
+  if(bin_path != NULL){
+    path = bin_path;
+  }
 
   fp = fopen("BB_Attack.bin","rb");
+  if(fp == NULL){
+    return -1;
+  }
 
   FILE_READ( Attack_WPawn, 32 );
   FILE_READ( Attack_WSilver, 32 );
