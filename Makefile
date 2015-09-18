@@ -1,5 +1,5 @@
 komachan: board.o io.o data.o search.o ini.o
-	gcc -Wall -O2 src/main.c src/board.o src/io.o src/data.o src/search.o src/ini.o -o bin/komachan
+	gcc -Wall -O2 src/main.c src/board.o src/io.o src/data.o src/search.o src/ini.o -o komachan
 board.o: src/board.c
 	gcc -c src/board.c -o src/board.o
 io.o: src/io.c
