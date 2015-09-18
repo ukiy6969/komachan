@@ -1,11 +1,11 @@
 {
   "name": "komachan",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "gogoShogi game client",
   "private": false,
   "main": "index.js",
   "scripts": {
-    "install": "",
+    "install": "make",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
