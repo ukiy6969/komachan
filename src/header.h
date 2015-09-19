@@ -28,7 +28,6 @@ void out( const char *format, ... );
 void out_file( FILE *fp, const char *format, ... );
 void out_position();
 void out_board();
-int manual_move_str(char *str);
 void out_legalmoves( unsigned int moves[], int count );
 void str_CSA_move( char *buf, unsigned int move );
 unsigned int  CSA2Internal( const char *str );

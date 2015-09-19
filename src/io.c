@@ -16,6 +16,7 @@
 #define DELIM   " "
 
 static void manual_move( char **last );
+int manual_move_str(char **last);
 static void back();
 static void search_start();
 static void new_game();
@@ -28,7 +29,7 @@ int cmd_prompt(){
   char buf[256];
   const char *token;
   char *last;
-  int count_byte, ret;
+  int count_byte, ret, varidate;
 
   if( TURN && !server_mode)
     {
@@ -53,11 +54,11 @@ int cmd_prompt(){
 
   if( !strcmp( token, "quit" ) )
     { return -1; }
-  else if( !strcmp( token, "board" ) )
+  else if( !server_mode && !strcmp( token, "board" ) )
     { out_position(); }
-  else if( !strcmp( token, "back" ) )
+  else if( !server_mode && !strcmp( token, "back" ) )
     { back(); }
-  else if( !strcmp( token, "move" ) )
+  else if( !server_mode && !strcmp( token, "move" ) )
     { manual_move( &last ); }
   else if( !server_mode && !strcmp( token, "search" ) || !strcmp( token, "s" ) )
     { search_start(); }
@@ -67,8 +68,13 @@ int cmd_prompt(){
     { out_record( 1 ); }
   else if( server_mode && !strcmp(token, "search") )
     {
-      search_start();
+      search_start(1);
       out_server();
+    }
+  else if( server_mode && !strcmp(token, "move"))
+    {
+      varidate = manual_move_str( &last );
+      out_server(varidate);
     }
   else
     { ret = -1; }
@@ -179,21 +185,12 @@ static void manual_move( char **last )
 
   char str_move[8];
   str_CSA_move( str_move, move );
-  out("%s\n", str_move);
+  if ( server_mode ){
+    out("%s\n", str_move);
+  }
   MAKE_MOVE( move );
   out_position();
 
-}
-
-int manual_move_str( char *str){
-  unsigned int move;
-  move = CSA2Internal(str);
-  if( move == MOVE_NULL )
-    {
-      return -1;
-    }
-  MAKE_MOVE( move );
-  return 0;
 }
 
 void out_position()
@@ -445,11 +442,69 @@ void out_board(){
 
   return;
 }
+void str_Koma_move( char *str, char *addstr, unsigned int move )
+{
+  int type_c = MOVE_TYPE( move );
+  int type   = type_c & ~mask_piece_color;
+  int from   = MOVE_FROM( move );
+  int to     = MOVE_TO( move );
+  int prom   = MOVE_PROMOTE( move );
+  int cap    = MOVE_CAPTURE( move );
+  int cap_type = MOVE_CAPTURED_TYPE( move );
 
-void out_server(){
-  char str[8];
-  str_CSA_move( str, history[ N_PLY - 1].move );
-  out("%s\n", str);
+  if( from == move_drop )
+    {
+      snprintf( str, 7, "%d%d%d%d%s",
+                0, 0,
+                5-( to%5),    ( to/5   +1 ),
+                ch_piece_csa[ type ] );
+    }
+  else
+    {
+      snprintf( str, 7, "%d%d%d%d%s",
+                5-( from%5 ), ( from/5 +1 ),
+                5-( to%5),    ( to/5   +1 ),
+                ch_piece_csa[ type ] );
+    }
+
+  if( prom )
+    {
+      snprintf( addstr, 5, "%s%s",
+                ch_piece_csa[ type + m_promote ],
+                ch_piece_csa[ cap_type ]);
+    }
+  else
+    {
+      snprintf( addstr, 5, "%s%s",
+                ch_piece_csa[ 0 ],
+                ch_piece_csa[ cap_type ]);
+    }
+
+  return;
+}
+
+int manual_move_str( char **last){
+  const char *p = strtok_r( NULL, DELIM, last );
+  unsigned int move;
+  move = CSA2Internal(p);
+  if( move == MOVE_NULL )
+    {
+      return -1;
+    }
+  MAKE_MOVE( move );
+  return 0;
+}
+
+void out_server(int varidate){
+  char str[8], addstr[6];
+  int color;
+  if (varidate == -1 ){
+    out("ERROR: INVALID MOVE\n");
+    return ;
+  }
+  str_Koma_move( str, addstr, history[ N_PLY - 1].move );
+  color = ( N_PLY - 1 ) % 2;
+  out("%d%s%s\n", color, str, addstr);
   return;
 }
 
