@@ -8,3 +8,4 @@ binding.gyp
 src/ccfiles
 test
 **/*.log
+komachan
