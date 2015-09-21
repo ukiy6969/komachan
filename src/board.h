@@ -245,6 +245,7 @@ void make_move_b( unsigned int move );
 void unmake_move_w( );
 void unmake_move_b( );
 //指し手生成に関わる関数
+int is_attack(unsigned int *attack_pieces);
 int gen_legalmoves( unsigned legalmoves[] );
 int gen_evasion_w( unsigned int moves[], int count, int nAttacks,
                    unsigned int attack_pieces, unsigned int pin[] );
@@ -278,3 +279,4 @@ int popuCount( int piece );
 int get_turn();
 //N_PLYを返す
 int get_nply();
+int match(unsigned int move1, unsigned int move2);

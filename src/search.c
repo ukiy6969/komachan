@@ -23,7 +23,9 @@ int search_root()
 
   if( nmove == 0 )
     {
-      out( " This game was already concluded.\n" );
+      if(!server_mode){
+        out( " This game was already concluded.\n" );
+      }
       return -2;
     }
 

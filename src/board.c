@@ -47,6 +47,16 @@ const int Attack_Bishop_shift[32] =
   22, 23, 23, 23, 22
 };
 
+int is_attack(unsigned int *attack_pieces){
+  int nmove = 0;
+  if( TURN ){
+    nmove = attacks_to_w( SQ_B_KING, attack_pieces);
+  } else {
+    nmove = attacks_to_b( SQ_W_KING, attack_pieces);
+  }
+  return nmove;
+}
+
 int gen_legalmoves( unsigned int moves[] )
 {
   unsigned int pin[32], attack_on_king;
@@ -2032,4 +2042,14 @@ int get_turn()
 int get_nply()
 {
   return N_PLY;
+}
+
+int match(unsigned int move1, unsigned int move2){
+  int type = ( MOVE_TYPE( move1 ) == MOVE_TYPE( move2 ) );
+  int from = ( MOVE_FROM( move1 ) == MOVE_FROM( move2 ) );
+  int to   = ( MOVE_TO( move1 ) == MOVE_TO( move2 ) );
+  if(type && from && to){
+    return 1;
+  }
+  return 0;
 }

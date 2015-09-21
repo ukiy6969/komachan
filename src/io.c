@@ -20,6 +20,7 @@ int manual_move_str(char **last);
 static void back();
 static void search_start();
 static void new_game();
+void out_legalmoves_server();
 
 int cmd_prompt(){
   /*
@@ -68,13 +69,17 @@ int cmd_prompt(){
     { out_record( 1 ); }
   else if( server_mode && !strcmp(token, "search") )
     {
-      search_start(1);
-      out_server();
+      varidate = search_root();
+      out_server(varidate);
     }
   else if( server_mode && !strcmp(token, "move"))
     {
       varidate = manual_move_str( &last );
       out_server(varidate);
+    }
+  else if( server_mode && !strcmp(token, "legal"))
+    {
+      out_legalmoves_server();
     }
   else
     { ret = -1; }
@@ -451,6 +456,9 @@ void str_Koma_move( char *str, char *addstr, unsigned int move )
   int prom   = MOVE_PROMOTE( move );
   int cap    = MOVE_CAPTURE( move );
   int cap_type = MOVE_CAPTURED_TYPE( move );
+  if(cap_type > 16){
+    cap_type -= 16;
+  }
 
   if( from == move_drop )
     {
@@ -485,26 +493,58 @@ void str_Koma_move( char *str, char *addstr, unsigned int move )
 
 int manual_move_str( char **last){
   const char *p = strtok_r( NULL, DELIM, last );
-  unsigned int move;
+  unsigned int i, move, nmove, legalmoves[ SIZE_LEGALMOVES ];
   move = CSA2Internal(p);
+  nmove = gen_legalmoves(legalmoves);
   if( move == MOVE_NULL )
     {
       return -1;
+    }
+  for(i=0; i<nmove; i++){
+    if(match(move, legalmoves[i])){
+      break;
+    }
+  }
+  if( i == nmove )
+    {
+      return -2;
     }
   MAKE_MOVE( move );
   return 0;
 }
 
+void out_legalmoves_server(){
+  char moves_str[8];
+  unsigned int i, move, nmove, legalmoves[ SIZE_LEGALMOVES ];
+  nmove = gen_legalmoves(legalmoves);
+  out("LEAGALMOVES:[");
+  for(i = 0; i < nmove; i++){
+    str_CSA_move(moves_str, legalmoves[i]);
+    out("%s,", moves_str);
+  }
+  out("]\n");
+  return;
+}
+
 void out_server(int varidate){
-  char str[8], addstr[6];
-  int color;
+  char str[8], addstr[6], attack[7];
+  int color, is_att, attack_pieces;
   if (varidate == -1 ){
     out("ERROR: INVALID MOVE\n");
     return ;
   }
+  is_att = is_attack(&attack_pieces);
   str_Koma_move( str, addstr, history[ N_PLY - 1].move );
   color = ( N_PLY - 1 ) % 2;
-  out("%d%s%s\n", color, str, addstr);
+  if(varidate == -2){
+    out("%s\n", "LOSE:INVALID MOVE");
+    return;
+  }
+  if( is_att ){
+    out("%d%s%s%s\n", color, str, addstr, ":ATTACK");
+  }else {
+    out("%d%s%s\n", color, str, addstr);
+  }
   return;
 }
 

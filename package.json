@@ -23,6 +23,7 @@
   "homepage": "https://github.com/ukiy/komachan#readme",
   "devDependencies": {},
   "dependencies": {
-    "lodash": "^3.10.1"
+    "lodash": "^3.10.1",
+    "split": "^1.0.0"
   }
 }

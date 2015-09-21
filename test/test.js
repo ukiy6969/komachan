@@ -13,8 +13,14 @@ var moveObj = {
   },
   piece:'GI'
 };
-koma1.move(moveObj, function(data){
-  console.log(data);
+//koma1.move(moveObj, function(err, data){
+//  console.log(data);
+//});
+koma1.legal(function(err, data){
+  console.log('1', data);
+});
+koma1.legal(function(err, data){
+  console.log('2',data);
 });
 /*
 koma1.move('search\n', function(data){
