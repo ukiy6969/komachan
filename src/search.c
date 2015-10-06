@@ -67,6 +67,10 @@ int search_root(double *search_time)
 
       }
 
+    if (d != depth) {
+      move_ordering(evals, legalmoves, nmove);
+    }
+
     if ( ((double)clock() - start)/CLOCKS_PER_SEC > maxtime) {
       break;
     }
@@ -81,8 +85,25 @@ int search_root(double *search_time)
   return 0;
 }
 
-void moveordering(int *evals, int *legal_moves, int n) {
-  
+
+void move_ordering(short *evals, int *legal_moves, int n) {
+  /** insert sort **/
+  short tmp_e;
+  int i, j, tmp_l;
+  for (i = 1; i < n; i++) {
+    tmp_e = evals[i];
+    tmp_l = legal_moves[i];
+    if (evals[i - 1] < tmp_e) {
+      j = i;
+      do {
+        evals[j] = evals[j - 1];
+        legal_moves[j] = legal_moves[j - 1];
+        j--;
+      } while(j > 0 && evals[j - 1] < tmp_e);
+      evals[j] = tmp_e;
+      legal_moves[j] = tmp_l;
+    }
+  }
 }
 
 int search( short alpha, short beta, int depth, int ply )

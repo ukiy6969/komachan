@@ -41,5 +41,6 @@ void game_finalize();
 
 /* search.c */
 int search_root(double *time);
+void move_ordering(short *evals, int *legal_moves, int n);
 int search( short alpha, short beta, int depth, int ply);
 short evaluate();
