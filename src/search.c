@@ -5,7 +5,7 @@
 #include <assert.h>
 #include "header.h"
 
-int search_root()
+int search_root(double *search_time)
 {
   /*
     ret =  0: succeeded
@@ -15,9 +15,13 @@ int search_root()
   int imove, best;
   int nmove = 0;
   int depth = SEARCH_DEPTH;
+  int d, start, end;
+  int maxtime = 10000;
+  double test = 0;
   short value;
   short beta, max = 0;
   unsigned int legalmoves[ SIZE_LEGALMOVES ];
+  short evals[ SIZE_LEGALMOVES ];
 
   nmove = gen_legalmoves( legalmoves );
 
@@ -41,22 +45,44 @@ int search_root()
   max   = -SCORE_MAX;
   beta  = SCORE_MAX;
 
-  for( imove = 0; imove < nmove; imove++ )
-    {
-      MAKE_MOVE( legalmoves[ imove ] );
-      value = -search( -beta, -max, depth -1, 1 );
-      UNMAKE_MOVE;
+  start = clock();
 
-      if( value > max )
-        {
-          max = value;
-          best = imove;
-        }
+  for(d = 2; d <= depth; d++  ){
 
+    best = 0;
+    max   = -SCORE_MAX;
+    beta  = SCORE_MAX;
+    for( imove = 0; imove < nmove; imove++ )
+      {
+        MAKE_MOVE( legalmoves[ imove ] );
+        value = -search( -beta, -max, d -1, 1 );
+        evals[imove] = value;
+        UNMAKE_MOVE;
+
+        if( value > max )
+          {
+            max = value;
+            best = imove;
+          }
+
+      }
+
+    if ( ((double)clock() - start)/CLOCKS_PER_SEC > maxtime) {
+      break;
     }
+
+  }
+
+  end = clock();
+
+  *search_time = (((double)end - start)/CLOCKS_PER_SEC);
 
   MAKE_MOVE( legalmoves[ best ] );
   return 0;
+}
+
+void moveordering(int *evals, int *legal_moves, int n) {
+  
 }
 
 int search( short alpha, short beta, int depth, int ply )

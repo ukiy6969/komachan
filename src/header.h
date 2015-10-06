@@ -40,6 +40,6 @@ void game_initialize();
 void game_finalize();
 
 /* search.c */
-int search_root();
+int search_root(double *time);
 int search( short alpha, short beta, int depth, int ply);
 short evaluate();

@@ -31,6 +31,7 @@ int cmd_prompt(){
   const char *token;
   char *last;
   int count_byte, ret, varidate;
+  double search_time;
 
   if( TURN && !server_mode)
     {
@@ -69,7 +70,7 @@ int cmd_prompt(){
     { out_record( 1 ); }
   else if( server_mode && !strcmp(token, "search") )
     {
-      varidate = search_root();
+      varidate = search_root(&search_time);
       out_server(varidate);
     }
   else if( server_mode && !strcmp(token, "move"))
@@ -145,10 +146,10 @@ static void new_game()
   out_position();
 }
 
-static void search_start()
+static void search_start(double *time)
 {
   int iret;
-  iret = search_root();
+  iret = search_root(time);
   if( iret == -2 )
     {
       out( " This game was already concluded.\n");
@@ -159,6 +160,7 @@ static void search_start()
       out( " Search() failed.\n" );
       return;
     }
+  out(" Search Time is %lf\n", *time);
   out_position();
   return;
 }
