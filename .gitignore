@@ -11,3 +11,4 @@ test
 komachan
 src/lib/**/*
 *.bin
+test/*
