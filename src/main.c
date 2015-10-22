@@ -13,6 +13,7 @@ int main( int argc, char *argv[] )
 {
   int ret,i;
   char* bin_path = "BB_Attack.bin";
+  char* zobrist_path = "Zobrist_rand.bin";
 
   is_log_output = 1;
   if (argc > 1) {
@@ -28,6 +29,10 @@ int main( int argc, char *argv[] )
         strtok(argv[i], "=");
         bin_path = strtok(NULL, "");
       }
+      if (strstr(argv[i], "--zobrist-path=") != NULL){
+        strtok(argv[i], "=");
+        zobrist_path = strtok(NULL, "");
+      }
     }
   }
 
@@ -38,6 +43,7 @@ int main( int argc, char *argv[] )
   if( starting_initialize(bin_path) )
     { exit(1); }
   game_initialize();
+  zobrist_init(zobrist_path);
 
   out_position();
 

@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <string.h>
 #include <stdio.h>
+#include "lib/mt64.h"
 #include "board.h"
 
 tree_t game;
@@ -46,6 +47,116 @@ const int Attack_Bishop_shift[32] =
   23, 23, 23, 23, 23,
   22, 23, 23, 23, 22
 };
+
+
+unsigned long long PIECE_INFO_RAND[32][32];
+unsigned long long HAND_INFO_RAND[2][4][8];
+unsigned long long TURN_RAND[2];
+
+/** return -1 fail
+  * return 1 success
+**/
+
+#define FILE_CREATE( variable, size ) \
+  if( fwrite( variable, sizeof( unsigned long long ), size, fp) != size ){ \
+    printf(" fwrite \"%s\" failed.\n", #variable); \
+    fclose( fp ); return -1; }\
+
+int zobrist_create(char *zobrist_name) {
+  FILE *fp;
+  int i, j, k;
+
+  if ( (fp = fopen(zobrist_name, "wb")) == NULL ) {
+    return -1;
+  }
+
+  for(i = 0; i < 32; i++) {
+    for(j = 0; j < 32; j++) {
+      PIECE_INFO_RAND[i][j] = genrand64_int64();
+      FILE_CREATE( &PIECE_INFO_RAND[i][j] , 1);
+    }
+  }
+
+  for(i = 0; i < 2; i++) {
+    for(j = 0; j < 4; j++) {
+      for (k = 0; k < 8; k++){
+        HAND_INFO_RAND[i][j][k] = genrand64_int64();
+        FILE_CREATE( &HAND_INFO_RAND[i][j][k] , 1);
+      }
+    }
+  }
+
+  for(i = 0; i < 2; i++) {
+    TURN_RAND[i] = genrand64_int64();
+    FILE_CREATE( &TURN_RAND[i] , 1);
+  }
+
+  return fclose(fp) == 0;
+}
+
+#undef FILE_CREATE
+
+#define FILE_READ( variable, size ) \
+  if( fread( variable, sizeof( unsigned long long ), size, fp) != size ){ \
+    printf(" fwrite \"%s\" failed.\n", #variable); \
+    fclose( fp ); return -1; }\
+
+int zobrist_init(char *zobrist_path) {
+  /** int long bit **/
+  FILE *fp;
+  int ret;
+  int i, j;
+  char *zobrist_name = "Zobrist_rand.bin";
+  if (zobrist_path != NULL) {
+    zobrist_name = zobrist_path;
+  }
+
+  if ( (fp = fopen(zobrist_name, "rb")) == NULL) {
+    ret = zobrist_create(zobrist_name);
+    if (!ret) { return -1; }
+    fp = fopen(zobrist_name, "rb");
+  }
+
+  for(i = 0; i < 32; i++) {
+    FILE_READ( PIECE_INFO_RAND[i] , 32);
+  }
+  for(i = 0; i < 2; i++) {
+    for(j = 0; j < 4; j++){
+      FILE_READ( HAND_INFO_RAND[i][j] , 8);
+    }
+  }
+  for(i = 0; i < 2; i++) {
+    FILE_READ( HAND_INFO_RAND[i] , 1);
+  }
+  return fclose(fp) == 0;
+}
+
+#undef FILE_READ
+
+void printZobristHashed() {
+  int i,j,k;
+
+  for(i = 0; i < 32; i++) {
+    for(j = 0; j < 32; j++) {
+      printf("PIECE_INFO_RAND[%d][%d] = %llu\n",i, j, PIECE_INFO_RAND[i][j]);
+    }
+  }
+
+  for(i = 0; i < 2; i++) {
+    for(j = 0; j < 4; j++) {
+      for (k = 0; k < 8; k++){
+        printf("HAND_INFO_RAND[%d][%d][%d] = %llu\n", i, j,k, HAND_INFO_RAND[i][j][k]);
+      }
+    }
+  }
+
+  for(i = 0; i < 2; i++) {
+    printf("TURN_RAND[%d] = %llu\n",i, TURN_RAND[i]);
+  }
+}
+
+inline void update_zobrist(unsigned long long u){
+}
 
 int is_attack(unsigned int *attack_pieces){
   int nmove = 0;
@@ -1554,6 +1665,60 @@ int gen_nocap_b( unsigned int moves[], int count, unsigned int pin[]  )
     }
 
   return count;
+}
+
+void update_update_w( unsigned int move )
+{
+  const int from    = MOVE_FROM( move );
+  const int to      = MOVE_TO( move );
+  const int type    = MOVE_TYPE( move );
+  const int promote = move & move_mask_promote;
+  const int cap     = move & move_mask_capture;
+  int cap_type = 0;
+
+  assert( type < 16 );
+
+  if( from == move_drop )
+    {
+      UPDATE_ZOBRIST(HAND_INFO_RAND[white][W_HAND(type)][type]);
+      UPDATE_ZOBRIST(PIECE_INFO_RAND[type][to]);
+    }
+  else if( cap )
+    {
+      cap_type = get_piece_on_sq_b( to );
+      int cap_nopro = cap_type & mask_nopro;
+      assert( cap_type != no_piece && cap_type != b_king );
+
+      if( promote ) /* cap / pro */
+        {
+          UPDATE_ZOBRIST(PIECE_INFO_RAND[type][from]);
+          UPDATE_ZOBRIST(PIECE_INFO_RAND[type + m_promote][to]);
+        }
+      else /* cap / no pro */
+        {
+          UPDATE_ZOBRIST(PIECE_INFO_RAND[type][from]);
+          UPDATE_ZOBRIST(PIECE_INFO_RAND[type][to]);
+        }
+      UPDATE_ZOBRIST(PIECE_INFO_RAND[cap_type][to]);
+      UPDATE_ZOBRIST(HAND_INFO_RAND[white][W_HAND(cap_nopro)][to]);
+    }
+  else
+    {
+      if( promote ) /* no cap / pro */
+        {
+          UPDATE_ZOBRIST(PIECE_INFO_RAND[type][from]);
+          UPDATE_ZOBRIST(PIECE_INFO_RAND[type + m_promote][to]);
+        }
+      else /* no cap / no pro */
+        {
+          UPDATE_ZOBRIST(PIECE_INFO_RAND[type][from]);
+          UPDATE_ZOBRIST(PIECE_INFO_RAND[type][to]);
+        }
+    }
+
+  UPDATE_ZOBRIST(TURN_RAND[white]);
+
+  return;
 }
 
 
