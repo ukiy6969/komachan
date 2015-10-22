@@ -33,8 +33,8 @@ typedef struct
 
 //gameに，ゲームの全状態を格納しておく。
 //historyは，指し手の配列。これまでの手を登録する?
-extern tree_t game;
-extern hist_t history[ RECORD_SIZE ];
+//extern tree_t game; 使わない
+//extern hist_t history[ RECORD_SIZE ]; 使わない
 //2進数を表現する.binary
 enum { b0000, b0001, b0010, b0011, b0100, b0101, b0110, b0111,
        b1000, b1001, b1010, b1011, b1100, b1101, b1110, b1111,
@@ -205,6 +205,7 @@ enum{
 //指し手を反映させるマクロ
 //現在の手番のプレイヤのmake_moveを呼び出す．
 #define MAKE_MOVE(move)       TURN ? make_move_b( move ) : make_move_w( move );
+#define UNMAKE_MOVE           TURN ? unmake_move_w() : unmake_move_b();
 //手番を入れ替える．black^blackならwhiteに。white^blackならblackになる．
 #define FLIP_TURN             TURN ^= black;
 

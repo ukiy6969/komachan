@@ -22,6 +22,16 @@ const int Board::Attack_Bishop_shift[] = {
 Board::Board(){
 }
 
+int Board::is_attack(unsigned int *attack_pieces) {
+  int nmove = 0;
+  if( TURN ){
+    nmove = attacks_to_w( SQ_B_KING, attack_pieces);
+  } else {
+    nmove = attacks_to_b( SQ_W_KING, attack_pieces);
+  }
+  return nmove;
+}
+
 
 int Board::gen_legalmoves( unsigned int moves[] )
 {
