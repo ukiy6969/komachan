@@ -9,3 +9,5 @@ src/ccfiles
 test
 **/*.log
 komachan
+src/lib/**/*
+*.bin
