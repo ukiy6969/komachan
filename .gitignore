@@ -5,7 +5,6 @@ records
 node_modules
 build
 binding.gyp
-src/ccfiles
 test
 **/*.log
 komachan
