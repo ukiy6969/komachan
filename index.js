@@ -1,6 +1,6 @@
 var Komachan = require('./lib/komachan');
 module.exports = {
-  komachan: function(){
-    return new Komachan();
+  komachan: function(opt){
+    return new Komachan(opt);
   }
 }
