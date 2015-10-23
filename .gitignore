@@ -4,7 +4,6 @@ log
 records
 node_modules
 build
-binding.gyp
 test
 **/*.log
 komachan
