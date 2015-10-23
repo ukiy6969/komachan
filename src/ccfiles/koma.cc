@@ -2,67 +2,54 @@
 
 namespace komachan {
 
-using v8::Function;
-using v8::FunctionCallbackInfo;
-using v8::FunctionTemplate;
-using v8::HandleScope;
-using v8::Isolate;
-using v8::Local;
-using v8::Number;
-using v8::Object;
-using v8::Persistent;
-using v8::String;
-using v8::Value;
-
-Persistent<Function> Koma::constructor;
-
-Koma::Koma(double value) : value_(value) {
-}
-
-Koma::~Koma() {
-}
-
-void Koma::Init(Local<Object> exports) {
-  Isolate* isolate = exports->GetIsolate();
-
-  // Prepare constructor template
-  Local<FunctionTemplate> tpl = FunctionTemplate::New(isolate, New);
-  tpl->SetClassName(String::NewFromUtf8(isolate, "Koma"));
+void Komachan::NAN_MODULE_INIT(Init) {
+  v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(New);
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
-  // Prototype
-  NODE_SET_PROTOTYPE_METHOD(tpl, "plusOne", PlusOne);
+  Nan::SetPrototypeMethod(tpl, "getValue", GetValue);
 
-  constructor.Reset(isolate, tpl->GetFunction());
-  exports->Set(String::NewFromUtf8(isolate, "Koma"),
-               tpl->GetFunction());
+  constructor().Reset(Nan::GetFunction(tpl).ToLocalChecked());
 }
 
-void Koma::New(const FunctionCallbackInfo<Value>& args) {
-  Isolate* isolate = args.GetIsolate();
+Komachan::NAN_METHOD(NewInstance) {
+  v8::Local<v8::Function> cons = Nan::New(constructor());
+  double value = info[0]->IsNumber() ? Nan::To<double>(info[0]).FromJust() : 0;
+  const int argc = 1;
+  v8::Local<v8::Value> argv[1] = {Nan::New(value)};
+  info.GetReturnValue().Set(Nan::NewInstance(cons, argc, argv).ToLocalChecked());
+}
 
-  if (args.IsConstructCall()) {
-    // Invoked as constructor: `new Koma(...)`
-    double value = args[0]->IsUndefined() ? 0 : args[0]->NumberValue();
-    Koma* obj = new Koma(value);
-    obj->Wrap(args.This());
-    args.GetReturnValue().Set(args.This());
+// Needed for the next example:
+Komachan::inline double value() const {
+  return value_;
+}
+
+explicit Komachan(double value = 0) : value_(value) {}
+~Komachan() {}
+
+Komachan::NAN_METHOD(New) {
+  if (info.IsConstructCall()) {
+    double value = info[0]->IsNumber() ? Nan::To<double>(info[0]).FromJust() : 0;
+    Komachan * obj = new Komachan(value);
+    obj->Wrap(info.This());
+    info.GetReturnValue().Set(info.This());
   } else {
-    // Invoked as plain function `Koma(...)`, turn into construct call.
     const int argc = 1;
-    Local<Value> argv[argc] = { args[0] };
-    Local<Function> cons = Local<Function>::New(isolate, constructor);
-    args.GetReturnValue().Set(cons->NewInstance(argc, argv));
+    v8::Local<v8::Value> argv[argc] = {info[0]};
+    v8::Local<v8::Function> cons = Nan::New(constructor());
+    info.GetReturnValue().Set(Nan::NewInstance(cons, argc, argv).ToLocalChecked());
   }
 }
 
-void Koma::PlusOne(const FunctionCallbackInfo<Value>& args) {
-  Isolate* isolate = args.GetIsolate();
-
-  Koma* obj = ObjectWrap::Unwrap<Koma>(args.Holder());
-  obj->value_ += 1;
-
-  args.GetReturnValue().Set(Number::New(isolate, obj->value_));
+Komachan::NAN_METHOD(GetValue) {
+  Komachan* obj = ObjectWrap::Unwrap<Komachan>(info.This());
+  info.GetReturnValue().Set(obj->value_);
 }
+
+Komachan::inline Nan::Persistent<v8::Function> & constructor() {
+  static Nan::Persistent<v8::Function> my_constructor;
+  return my_constructor;
+}
+
 
 }  // namespace komachan

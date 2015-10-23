@@ -5,7 +5,7 @@ void close_program(Game* game);
 int main( int argc, char *argv[] )
 {
   int ret;
-  char* bin_path;
+  const char* bin_path;
   Game* game = new Game();
   Io* io = new Io(game);
   Board* board = io->get_board();

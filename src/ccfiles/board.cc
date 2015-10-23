@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "board.h"
+#include <random>
 
 const int Board::Attack_Rook_shift[] = {
   19, 20, 20, 20, 19,
@@ -20,6 +21,106 @@ const int Board::Attack_Bishop_shift[] = {
 };
 
 Board::Board(){
+}
+
+#define FILE_CREATE( variable, size ) \
+  if( fwrite( variable, sizeof( unsigned long long ), size, fp) != size ){ \
+    printf(" fwrite \"%s\" failed.\n", #variable); \
+    fclose( fp ); return -1; }\
+
+int Board::zobrist_create(const char *zobrist_name) {
+  FILE *fp;
+  int i, j, k;
+  std::random_device rd;
+  std::mt19937_64 mt(rd());
+
+  if ( (fp = fopen(zobrist_name, "wb")) == NULL ) {
+    return -1;
+  }
+
+  for(i = 0; i < 32; i++) {
+    for(j = 0; j < 32; j++) {
+      PIECE_INFO_RAND[i][j] = mt();
+      FILE_CREATE( &PIECE_INFO_RAND[i][j] , 1);
+    }
+  }
+
+  for(i = 0; i < 2; i++) {
+    for(j = 0; j < 4; j++) {
+      for (k = 0; k < 8; k++){
+        HAND_INFO_RAND[i][j][k] = mt();
+        FILE_CREATE( &HAND_INFO_RAND[i][j][k] , 1);
+      }
+    }
+  }
+
+  for(i = 0; i < 2; i++) {
+    TURN_RAND[i] = mt();
+    FILE_CREATE( &TURN_RAND[i] , 1);
+  }
+
+  return fclose(fp) == 0;
+}
+
+#undef FILE_CREATE
+
+#define FILE_READ( variable, size ) \
+  if( fread( variable, sizeof( unsigned long long ), size, fp) != size ){ \
+    printf(" fwrite \"%s\" failed.\n", #variable); \
+    fclose( fp ); return -1; }\
+
+int Board::zobrist_init(const char *zobrist_path) {
+  /** int long bit **/
+  FILE *fp;
+  int ret;
+  int i, j;
+  const char *zobrist_name = "Zobrist_rand.bin";
+  if (zobrist_path != NULL) {
+    zobrist_name = zobrist_path;
+  }
+
+  if ( (fp = fopen(zobrist_name, "rb")) == NULL) {
+    ret = zobrist_create(zobrist_name);
+    if (!ret) { return -1; }
+    fp = fopen(zobrist_name, "rb");
+  }
+
+  for(i = 0; i < 32; i++) {
+    FILE_READ( PIECE_INFO_RAND[i] , 32);
+  }
+  for(i = 0; i < 2; i++) {
+    for(j = 0; j < 4; j++){
+      FILE_READ( HAND_INFO_RAND[i][j] , 8);
+    }
+  }
+  for(i = 0; i < 2; i++) {
+    FILE_READ( HAND_INFO_RAND[i] , 1);
+  }
+  return fclose(fp) == 0;
+}
+
+#undef FILE_READ
+
+void Board::printZobristHashed() {
+  int i,j,k;
+
+  for(i = 0; i < 32; i++) {
+    for(j = 0; j < 32; j++) {
+      printf("PIECE_INFO_RAND[%d][%d] = %llu\n",i, j, PIECE_INFO_RAND[i][j]);
+    }
+  }
+
+  for(i = 0; i < 2; i++) {
+    for(j = 0; j < 4; j++) {
+      for (k = 0; k < 8; k++){
+        printf("HAND_INFO_RAND[%d][%d][%d] = %llu\n", i, j,k, HAND_INFO_RAND[i][j][k]);
+      }
+    }
+  }
+
+  for(i = 0; i < 2; i++) {
+    printf("TURN_RAND[%d] = %llu\n",i, TURN_RAND[i]);
+  }
 }
 
 int Board::is_attack(unsigned int *attack_pieces) {
@@ -1883,7 +1984,7 @@ int Board::get_piece_on_sq( int sq )
     printf(" fread \"%s\" failed.\n", #variable); \
     fclose( fp ); return -1; }\
 
-int Board::starting_initialize(char* bin_path)
+int Board::starting_initialize(const char* bin_path)
 {
   /*
     return -1: failed
@@ -1891,7 +1992,7 @@ int Board::starting_initialize(char* bin_path)
    */
 
   FILE *fp;
-  char* path = "BB_Attack.bin";
+  const char* path = "BB_Attack.bin";
 
   if(bin_path != NULL){
     path = bin_path;

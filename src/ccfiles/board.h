@@ -238,6 +238,11 @@ public:
   static const int Attack_Rook_shift[];
   static const int Attack_Bishop_shift[];
 
+  // ゾブリストハッシュ
+  unsigned long long PIECE_INFO_RAND[32][32];
+  unsigned long long HAND_INFO_RAND[2][4][8];
+  unsigned long long TURN_RAND[2];
+
   //calc_occupied_sq()にてbb_mask初期化
   //make_move_wにて，駒の移動先にて
   unsigned int nOccupiedW;
@@ -247,13 +252,14 @@ public:
   //ここからライブラリの用意する関数群
 
   //ゲーム状態の変更
-  int starting_initialize(char* bin_path); //利き情報の初期化
+  int starting_initialize(const char* bin_path); //利き情報の初期化
   void clear_game(); //盤面・手番・持ち駒を初期状態にリセット
   void make_move_w( unsigned int move );
   void make_move_b( unsigned int move );
   void unmake_move_w( );
   void unmake_move_b( );
   //指し手生成に関わる関数
+  int is_attack(unsigned int *attack_pieces);
   int gen_legalmoves( unsigned legalmoves[] );
   int gen_evasion_w( unsigned int moves[], int count, int nAttacks,
                      unsigned int attack_pieces, unsigned int pin[] );
@@ -292,4 +298,8 @@ public:
   void unmake_move();
   int w_hand(int piece);
   int b_hand(int piece);
+  // Zobrist method
+  int zobrist_create(const char *zobrist_name);
+  int zobrist_init(const char *zobrist_path);
+  void printZobristHashed();
 };

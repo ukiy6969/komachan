@@ -1,4 +1,5 @@
 #include "io.h"
+#include <iostream>
 
 #define DELIM   " "
 

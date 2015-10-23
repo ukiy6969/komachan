@@ -1,4 +1,4 @@
-C_PLUSPLUS=g++
+C_PLUSPLUS=g++ -std=c++11
 game: board.o search.o io.o game.o main.o
 	$(C_PLUSPLUS) -Wall -o game main.o board.o search.o io.o game.o
 board.o: board.cc

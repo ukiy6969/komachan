@@ -1,22 +1,23 @@
 #ifndef KOMA_H
 #define KOMA_H
 #include "game.h"
-#include <node.h>
-#include <node_object_wrap.h>
+#include <nan.h>
 
 namespace komachan {
 
-class Koma : public node::ObjectWrap {
+class Komachan : public Nan::ObjectWrap {
  public:
-  static void Init(v8::Local<v8::Object> exports);
+  static NAN_MODULE_INIT(Init);
+  static NAN_METHOD(NewInstance);
+  inline double value() const;
 
  private:
-  explicit Koma(double value = 0);
-  ~Koma();
+  explicit Komachan(double value = 0);
+  ~Komachan();
 
-  static void New(const v8::FunctionCallbackInfo<v8::Value>& args);
-  static void PlusOne(const v8::FunctionCallbackInfo<v8::Value>& args);
-  static v8::Persistent<v8::Function> constructor;
+  static NAN_METHOD(New);
+  static NAN_METHOD(GetValue);
+  static inline Nan::Persistent<v8::Function> & constructor();
   double value_;
 };
 
