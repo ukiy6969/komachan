@@ -4,6 +4,8 @@ Search::Search(Board* b){
   board = b;
 }
 
+inline void move_ordering(short *evals, unsigned int *legal_moves, int n);
+
 int Search::search_root()
 {
   /*
@@ -14,9 +16,13 @@ int Search::search_root()
   int imove, best;
   int nmove = 0;
   int depth = SEARCH_DEPTH;
+  int d, start, end;
+  int maxtime = SEARCH_MAX_TIME;
+  int search_time;
   short value;
   short beta, max = 0;
   unsigned int legalmoves[ SIZE_LEGALMOVES ];
+  short evals[ SIZE_LEGALMOVES ];
 
   nmove = board->gen_legalmoves( legalmoves );
 
@@ -38,22 +44,64 @@ int Search::search_root()
   max   = -SCORE_MAX;
   beta  = SCORE_MAX;
 
-  for( imove = 0; imove < nmove; imove++ )
-    {
-      board->make_move( legalmoves[ imove ] );
-      value = -search( -beta, -max, depth -1, 1 );
-      board->unmake_move();
+  start = clock();
 
-      if( value > max )
-        {
-          max = value;
-          best = imove;
-        }
+  for(d = 2; d <= depth; d++  ){
+
+    best = 0;
+    max   = -SCORE_MAX;
+    beta  = SCORE_MAX;
+    for( imove = 0; imove < nmove; imove++ ) {
+
+        board->make_move( legalmoves[ imove ] );
+        value = -search( -beta, -max, depth -1, 1 );
+        evals[imove] = value;
+        board->unmake_move();
+
+        if( value > max )
+          {
+            max = value;
+            best = imove;
+          }
 
     }
 
+    if (d != depth) {
+      move_ordering(evals, legalmoves, nmove);
+    }
+
+    if ( ((double)clock() - start)/CLOCKS_PER_SEC > maxtime) {
+      break;
+    }
+
+  }
+
+  end = clock();
+
+  search_time = (((double)end - start)/CLOCKS_PER_SEC);
+
   board->make_move( legalmoves[ best ] );
-  return 0;
+  return search_time;
+}
+
+inline void move_ordering(short *evals, unsigned int *legal_moves, int n) {
+  /** insert sort **/
+  short tmp_e;
+  int i, j, tmp_l;
+  for (i = 1; i < n; i++) {
+    tmp_e = evals[i];
+    tmp_l = legal_moves[i];
+    if (evals[i - 1] < tmp_e) {
+      j = i;
+      do {
+        evals[j] = evals[j - 1];
+        legal_moves[j] = legal_moves[j - 1];
+        j--;
+      } while(j > 0 && evals[j - 1] < tmp_e);
+      evals[j] = tmp_e;
+      legal_moves[j] = tmp_l;
+    }
+  }
 }
 
 int Search::search( short alpha, short beta, int depth, int ply )
