@@ -56,7 +56,7 @@ int Io::cmd_prompt(){
   char buf[256];
   const char *token;
   char *last;
-  int count_byte, ret;
+  int count_byte, ret = 0;
 
   if( board->get_turn() && !server_mode)
     {
@@ -87,7 +87,7 @@ int Io::cmd_prompt(){
     { back(); }
   else if( !strcmp( token, "move" ) )
     { manual_move( &last ); }
-  else if( !server_mode && !strcmp( token, "search" ) || !strcmp( token, "s" ) )
+  else if( !server_mode && (!strcmp( token, "search" ) || !strcmp( token, "s" )) )
     { search_start(); }
   else if( !strcmp( token, "new" )  )
     { new_game(); }
