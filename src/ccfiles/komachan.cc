@@ -20,9 +20,16 @@ class Komachan : public Nan::ObjectWrap {
 
   static NAN_METHOD(NewInstance) {
     v8::Local<v8::Function> cons = Nan::New(constructor());
-    double value = info[0]->IsNumber() ? Nan::To<double>(info[0]).FromJust() : 0;
+    //double value = info[0]->IsNumber() ? Nan::To<double>(info[0]).FromJust() : 0;
     const int argc = 1;
-    v8::Local<v8::Value> argv[1] = {Nan::New(value)};
+    std::string binPath;
+    v8::Local<v8::Object> opt = Nan::To<v8::Object>(info[0]).ToLocalChecked();
+    if (Nan::Has(opt, Nan::New<v8::String>("binPath").ToLocalChecked()).FromJust()) {
+      v8::Local<v8::String> _binPath = Nan::To<v8::String>(Nan::Get(opt, Nan::New<v8::String>("binPath").ToLocalChecked()).ToLocalChecked()).ToLocalChecked();
+      Nan::Utf8String _bp(_binPath);
+      binPath = *_bp;
+    }
+    v8::Local<v8::Value> argv[1] = {info[0]};
     info.GetReturnValue().Set(Nan::NewInstance(cons, argc, argv).ToLocalChecked());
   }
 
@@ -40,7 +47,6 @@ class Komachan : public Nan::ObjectWrap {
         v8::Local<v8::String> _binPath = Nan::To<v8::String>(Nan::Get(opt, Nan::New<v8::String>("binPath").ToLocalChecked()).ToLocalChecked()).ToLocalChecked();
         Nan::Utf8String _bp(_binPath);
         binPath = *_bp;
-        std::cout << binPath << std::endl;
       }
       Komachan * obj = new Komachan(binPath);
       obj->Wrap(info.This());
@@ -55,9 +61,8 @@ class Komachan : public Nan::ObjectWrap {
 
   static NAN_METHOD(Start) {
     Komachan* obj = ObjectWrap::Unwrap<Komachan>(info.This());
-    const char *bin_path = "BB_Attack.bin";
-    obj->game.get_board()->starting_initialize(bin_path);
     obj->game.game_initialize();
+    obj->game.get_board()->printZobristHashed();
     info.GetReturnValue().SetNull();
   }
 
