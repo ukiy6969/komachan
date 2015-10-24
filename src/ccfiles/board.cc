@@ -28,13 +28,13 @@ Board::Board(){
     printf(" fwrite \"%s\" failed.\n", #variable); \
     fclose( fp ); return -1; }\
 
-int Board::zobrist_create(const char *zobrist_name) {
+int Board::zobrist_create(std::string zobrist_name) {
   FILE *fp;
   int i, j, k;
   std::random_device rd;
   std::mt19937_64 mt(rd());
 
-  if ( (fp = fopen(zobrist_name, "wb")) == NULL ) {
+  if ( (fp = fopen(zobrist_name.c_str(), "wb")) == NULL ) {
     return -1;
   }
 
@@ -69,20 +69,18 @@ int Board::zobrist_create(const char *zobrist_name) {
     printf(" fwrite \"%s\" failed.\n", #variable); \
     fclose( fp ); return -1; }\
 
-int Board::zobrist_init(const char *zobrist_path) {
+int Board::zobrist_init(std::string binPath) {
   /** int long bit **/
   FILE *fp;
   int ret;
   int i, j;
-  const char *zobrist_name = "Zobrist_rand.bin";
-  if (zobrist_path != NULL) {
-    zobrist_name = zobrist_path;
-  }
+  std::string bp(binPath);
+  bp.append("/Zobrist_rand.bin");
 
-  if ( (fp = fopen(zobrist_name, "rb")) == NULL) {
-    ret = zobrist_create(zobrist_name);
+  if ( (fp = fopen(bp.c_str(), "rb")) == NULL) {
+    ret = zobrist_create(bp);
     if (!ret) { return -1; }
-    fp = fopen(zobrist_name, "rb");
+    fp = fopen(bp.c_str(), "rb");
   }
 
   for(i = 0; i < 32; i++) {
@@ -1984,7 +1982,7 @@ int Board::get_piece_on_sq( int sq )
     printf(" fread \"%s\" failed.\n", #variable); \
     fclose( fp ); return -1; }\
 
-int Board::starting_initialize(const char* bin_path)
+int Board::starting_initialize(const std::string binPath)
 {
   /*
     return -1: failed
@@ -1992,13 +1990,13 @@ int Board::starting_initialize(const char* bin_path)
    */
 
   FILE *fp;
-  const char* path = "BB_Attack.bin";
+  std::string name = "/BB_Attack.bin";
+  std::string bp(binPath);
 
-  if(bin_path != NULL){
-    path = bin_path;
-  }
+  bp.append(name);
+  //std::cout << "binPath: " << bp << std::endl;
 
-  fp = fopen("BB_Attack.bin","rb");
+  fp = fopen(bp.c_str(),"rb");
   if(fp == NULL){
     return -1;
   }
