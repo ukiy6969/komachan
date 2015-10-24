@@ -8,6 +8,7 @@ private:
   std::string binPath;
 public:
   Game(std::string binPath = "./");
+  ~Game();
   Board* get_board();
   Search* get_search();
   void game_initialize();

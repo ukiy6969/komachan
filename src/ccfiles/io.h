@@ -18,6 +18,7 @@ private:
   int is_log_output;
 public:
   Io(Game* g);
+  ~Io();
   Board* get_board();
   static const int SIZE_FILENAME = 64;
   int cmd_prompt();

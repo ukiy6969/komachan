@@ -5,7 +5,7 @@ void close_program(Game* game);
 int main( int argc, char *argv[] )
 {
   int ret;
-  const char* bin_path;
+  char* bin_path;
   Game* game = new Game();
   Io* io = new Io(game);
   Board* board = io->get_board();
@@ -27,7 +27,7 @@ int main( int argc, char *argv[] )
     bin_path = "./setting";
   }
 
-  std::string binPath(*bin_path);
+  std::string binPath(bin_path);
 
   game->game_initialize();
 

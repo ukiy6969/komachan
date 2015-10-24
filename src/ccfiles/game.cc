@@ -6,6 +6,11 @@ Game::Game(std::string bp): binPath(bp){
   search = new Search(board);
 }
 
+Game::~Game() {
+  delete board;
+  delete search;
+}
+
 Board* Game::get_board(){
   return board;
 }
@@ -15,11 +20,11 @@ Search* Game::get_search(){
 }
 
 void Game::game_initialize(){
-  board->clear_game();
-  if ( board->starting_initialize(binPath) < 0 ) {
+  if ( board->zobrist_init(binPath) < 0 ) {
     exit(1);
   }
-  if ( board->zobrist_init(binPath) < 0 ) {
+  board->clear_game();
+  if ( board->starting_initialize(binPath) < 0 ) {
     exit(1);
   }
 }

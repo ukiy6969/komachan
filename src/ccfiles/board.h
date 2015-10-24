@@ -24,6 +24,7 @@ struct tree
   int sq_bking; //黒の玉の位置
   char turn; //現在の手番
   short n_ply; //現在の手数
+  unsigned long long zobrist;
 };
 
 //指し手の履歴ひとつ分を示す構造体
@@ -169,6 +170,9 @@ enum{
 //始めにビットが立っている位置を取得する
 #define FIRSTONE(bb)   (31 - __builtin_clz( bb )) /* ret -1: bb = 0 */
 
+#define ZOBRIST        (game.zobrist)
+#define UPDATE_ZOBRIST( u )  (update_zobrist(u))
+
 /* move
   ........ ........ ...xxxxx piece to move
   ........ ......xx xxx..... starting square ( 25-> drop )
@@ -303,4 +307,6 @@ public:
   int zobrist_create(std::string zobrist_name);
   int zobrist_init(std::string zobrist_path);
   void printZobristHashed();
+  void update_zobrist(unsigned long long);
+  unsigned long long get_zobrist();
 };

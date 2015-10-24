@@ -44,6 +44,10 @@ Io::Io(Game* g){
     { file_log = fopen( str_file, "w" ); }
 }
 
+Io::~Io() {
+  delete game;
+}
+
 Board* Io::get_board(){
   return board;
 }
@@ -469,6 +473,8 @@ void Io::out_board(){
       if( board->w_hand(i) > 0 )
         out(" %s%d", ch_piece[i], board->w_hand(i) );
     }
+  out("\ncal_zobrist_hash=%llu\n", board->game.zobrist );
+  out("get_zobrist_hash=%llu\n", board->get_zobrist() );
   out("\n\n");
 
   return;
