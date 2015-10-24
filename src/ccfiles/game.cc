@@ -1,10 +1,6 @@
 #include "game.h"
 
 
-const char *_ch_piece_csa[16] =
-{ "--", "FU", "--", "--", "GI", "KI", "KA", "HI",
-  "OU", "TO", "--", "--", "NG", "--", "UM", "RY" };
-
 Game::Game(std::string bp): binPath(bp){
   board = new Board();
   search = new Search(board);
@@ -20,6 +16,12 @@ Search* Game::get_search(){
 
 void Game::game_initialize(){
   board->clear_game();
+  if ( board->starting_initialize(binPath) < 0 ) {
+    exit(1);
+  }
+  if ( board->zobrist_init(binPath) < 0 ) {
+    exit(1);
+  }
 }
 
 void Game::game_finalize(){
@@ -30,6 +32,9 @@ unsigned int Game::move(double _fromX, double _fromY, double _toX, double _toY, 
   int from, to, type, type_c, prom, cap, cap_type;
   int fromX, fromY, toX, toY, i;
   const char *buf;
+  const char *_ch_piece_csa[16] =
+  { "--", "FU", "--", "--", "GI", "KI", "KA", "HI",
+    "OU", "TO", "--", "--", "NG", "--", "UM", "RY" };
 
   fromX = int(_fromX);
   fromY = int(_fromY);
