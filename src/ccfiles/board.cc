@@ -131,7 +131,7 @@ inline void Board::update_zobrist(unsigned long long u){
 unsigned long long Board::get_zobrist() {
   int index = 0, type = 0;
 
-  unsigned long long res = TURN_RAND[TURN];
+  unsigned long long res = TURN_RAND[(int) TURN ];
 
   for( int i=0; i<5; i++ ) {
     for( int j=0; j<5; j++ ) {
@@ -1668,7 +1668,6 @@ int Board::gen_nocap_b( unsigned int moves[], int count, unsigned int pin[]  )
 
 void Board::make_move_w( unsigned int move )
 {
-  get_zobrist();
   const int from    = MOVE_FROM( move );
   const int to      = MOVE_TO( move );
   const int type    = MOVE_TYPE( move );
@@ -1688,6 +1687,7 @@ void Board::make_move_w( unsigned int move )
       nOccupiedW ^= Bit( to );
       Occupied0  ^= Bit( to );
 
+      UPDATE_ZOBRIST(HAND_INFO_RAND[white][W_HAND(type)][type]);
     }
   else if( cap )
     {
@@ -1757,7 +1757,7 @@ void Board::make_move_w( unsigned int move )
   UPDATE_ZOBRIST(TURN_RAND[white]);
   FLIP_TURN;
   N_PLY ++;
-
+  /*
   std::cout << " from " << from
             << " to "   << to
             << " type " << type
@@ -1765,6 +1765,7 @@ void Board::make_move_w( unsigned int move )
             << " cap "  << cap
             << " cap_type" << cap_type
             << std::endl;
+  */
   return;
 }
 
@@ -1782,12 +1783,14 @@ void Board::make_move_b( unsigned int move )
   if( from == move_drop )
     {
       UPDATE_ZOBRIST(HAND_INFO_RAND[black][B_HAND(type)][type]);
-      UPDATE_ZOBRIST(PIECE_INFO_RAND[type + m_promote][to]);
+      UPDATE_ZOBRIST(PIECE_INFO_RAND[type][to]);
       B_HAND_A -= HAND_ADD( type & mask_nopro );
       BB_N( type ) |= Bit( to );
 
       nOccupiedB  ^= Bit( to );
       Occupied0   ^= Bit( to );
+
+      UPDATE_ZOBRIST(HAND_INFO_RAND[black][B_HAND(type)][type]);
     }
   else if( cap )
     {
@@ -1857,7 +1860,7 @@ void Board::make_move_b( unsigned int move )
   FLIP_TURN;
   N_PLY ++;
 
-  ///*
+  /*
   std::cout << " from " << from
             << " to "   << to
             << " type " << type
@@ -1865,7 +1868,7 @@ void Board::make_move_b( unsigned int move )
             << " cap "  << cap
             << " cap_type" << cap_type
             << std::endl;
-  //*/
+  */
   return;
 }
 
@@ -1883,16 +1886,24 @@ void Board::unmake_move_w()
 
   if( from == move_drop )
     {
+      UPDATE_ZOBRIST(HAND_INFO_RAND[white][W_HAND(type)][type]);
+      UPDATE_ZOBRIST(PIECE_INFO_RAND[type][to]);
       W_HAND_A += HAND_ADD( type );
       BB_N( type ) ^= Bit( to );
 
       nOccupiedW ^= Bit( to );
       Occupied0  ^= Bit( to );
+      UPDATE_ZOBRIST(HAND_INFO_RAND[white][W_HAND(type)][type]);
     }
   else if( cap_type )
     {
+      int cap_nopro = cap_type & mask_nopro;
+      assert( cap_type != no_piece && cap_type != b_king );
+      UPDATE_ZOBRIST(HAND_INFO_RAND[white][W_HAND(cap_nopro)][cap_nopro]);
       if( promote ) /* cap / pro */
         {
+          UPDATE_ZOBRIST(PIECE_INFO_RAND[type][from]);
+          UPDATE_ZOBRIST(PIECE_INFO_RAND[type + m_promote][to]);
           BB_N( type ) ^= Bit( from );
           BB_N( type + m_promote ) ^= Bit( to );
           BB_N( cap_type ) ^= Bit( to );
@@ -1904,6 +1915,8 @@ void Board::unmake_move_w()
         }
       else /* cap / no pro */
         {
+          UPDATE_ZOBRIST(PIECE_INFO_RAND[type][from]);
+          UPDATE_ZOBRIST(PIECE_INFO_RAND[type][to]);
           BB_N( type ) ^= Bit( from ) | Bit( to );
           BB_N( cap_type ) ^= Bit( to );
           W_HAND_A -= HAND_ADD( cap_type & mask_nopro );
@@ -1912,11 +1925,15 @@ void Board::unmake_move_w()
           nOccupiedB ^= Bit( to );
           Occupied0  ^= Bit( from );
         }
+      UPDATE_ZOBRIST(PIECE_INFO_RAND[cap_type][to]);
+      UPDATE_ZOBRIST(HAND_INFO_RAND[white][W_HAND(cap_nopro)][cap_nopro]);
     }
   else
     {
       if( promote ) /* no cap / pro */
         {
+          UPDATE_ZOBRIST(PIECE_INFO_RAND[type][from]);
+          UPDATE_ZOBRIST(PIECE_INFO_RAND[type + m_promote][to]);
           BB_N( type ) ^= Bit( from );
           BB_N( type + m_promote ) ^= Bit( to );
 
@@ -1925,6 +1942,8 @@ void Board::unmake_move_w()
         }
       else /* no cap / no pro */
         {
+          UPDATE_ZOBRIST(PIECE_INFO_RAND[type][from]);
+          UPDATE_ZOBRIST(PIECE_INFO_RAND[type][to]);
           BB_N( type ) ^= Bit( from ) | Bit( to );
 
           nOccupiedW ^= Bit( from ) | Bit( to );
@@ -1933,6 +1952,8 @@ void Board::unmake_move_w()
     }
   SQ_W_KING = FirstOne( BB_W_KING );
 
+  UPDATE_ZOBRIST(TURN_RAND[black]);
+  UPDATE_ZOBRIST(TURN_RAND[white]);
   return;
 }
 
@@ -1950,16 +1971,25 @@ void Board::unmake_move_b()
 
   if( from == move_drop )
     {
+      UPDATE_ZOBRIST(HAND_INFO_RAND[black][B_HAND(type)][type]);
+      UPDATE_ZOBRIST(PIECE_INFO_RAND[type][to]);
       B_HAND_A += HAND_ADD( type & mask_nopro );
       BB_N( type ) ^= Bit( to );
 
       nOccupiedB ^= Bit( to );
       Occupied0  ^= Bit( to );
+
+      UPDATE_ZOBRIST(HAND_INFO_RAND[black][B_HAND(type)][type]);
     }
   else if( cap_type )
     {
+      int cap_nopro = cap_type & mask_nopro;
+      assert( cap_type != no_piece && cap_type != b_king );
+      UPDATE_ZOBRIST(HAND_INFO_RAND[black][B_HAND(cap_nopro)][cap_nopro]);
       if( promote ) /* cap / pro */
         {
+          UPDATE_ZOBRIST(PIECE_INFO_RAND[type][from]);
+          UPDATE_ZOBRIST(PIECE_INFO_RAND[type + m_promote][to]);
           BB_N( type ) ^= Bit( from );
           BB_N( type + m_promote ) ^= Bit( to );
           BB_N( cap_type ) ^= Bit( to );
@@ -1971,6 +2001,8 @@ void Board::unmake_move_b()
         }
       else /* cap / no pro */
         {
+          UPDATE_ZOBRIST(PIECE_INFO_RAND[type][from]);
+          UPDATE_ZOBRIST(PIECE_INFO_RAND[type][to]);
           BB_N( type ) ^= Bit( from ) | Bit( to );
           BB_N( cap_type ) ^= Bit( to );
           B_HAND_A -= HAND_ADD( cap_type & mask_nopro );
@@ -1979,11 +2011,15 @@ void Board::unmake_move_b()
           nOccupiedW ^= Bit( to );
           Occupied0  ^= Bit( from );
         }
+      UPDATE_ZOBRIST(PIECE_INFO_RAND[cap_type][to]);
+      UPDATE_ZOBRIST(HAND_INFO_RAND[black][B_HAND(cap_nopro)][cap_nopro]);
     }
   else
     {
       if( promote ) /* no cap / pro */
         {
+          UPDATE_ZOBRIST(PIECE_INFO_RAND[type][from]);
+          UPDATE_ZOBRIST(PIECE_INFO_RAND[type + m_promote][to]);
           BB_N( type ) ^= Bit( from );
           BB_N( type + m_promote ) ^= Bit( to );
 
@@ -1992,6 +2028,8 @@ void Board::unmake_move_b()
         }
       else /* no cap / no pro */
         {
+          UPDATE_ZOBRIST(PIECE_INFO_RAND[type][from]);
+          UPDATE_ZOBRIST(PIECE_INFO_RAND[type][to]);
           BB_N( type ) ^= Bit( from ) | Bit( to );
 
           nOccupiedB ^= Bit( from ) | Bit( to );
@@ -2000,6 +2038,8 @@ void Board::unmake_move_b()
     }
   SQ_B_KING = FirstOne( BB_B_KING );
 
+  UPDATE_ZOBRIST(TURN_RAND[black]);
+  UPDATE_ZOBRIST(TURN_RAND[white]);
   return;
 }
 

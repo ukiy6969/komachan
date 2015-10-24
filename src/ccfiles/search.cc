@@ -4,7 +4,7 @@ Search::Search(Board* b){
   board = b;
 }
 
-inline void move_ordering(short *evals, unsigned int *legal_moves, int n);
+inline void move_ordering(short *evals, unsigned int *legal_moves, unsigned int n);
 
 int Search::search_root()
 {
@@ -13,8 +13,8 @@ int Search::search_root()
         = -1: failed
         = -2: the game is already finished
    */
-  int imove, best;
-  int nmove = 0;
+  int best;
+  unsigned int nmove = 0, imove;
   int depth = SEARCH_DEPTH;
   int d, start, end;
   int maxtime = SEARCH_MAX_TIME;
@@ -84,10 +84,10 @@ int Search::search_root()
   return search_time;
 }
 
-inline void move_ordering(short *evals, unsigned int *legal_moves, int n) {
+inline void move_ordering(short *evals, unsigned int *legal_moves, unsigned int n) {
   /** insert sort **/
   short tmp_e;
-  int i, j, tmp_l;
+  unsigned int i, j, tmp_l;
   for (i = 1; i < n; i++) {
     tmp_e = evals[i];
     tmp_l = legal_moves[i];

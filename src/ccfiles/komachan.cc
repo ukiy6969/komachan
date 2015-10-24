@@ -9,10 +9,12 @@ class Komachan : public Nan::ObjectWrap {
  public:
   static NAN_MODULE_INIT(Init) {
     v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(New);
-    tpl->InstanceTemplate()->SetInternalFieldCount(3);
+    tpl->InstanceTemplate()->SetInternalFieldCount(5);
 
     Nan::SetPrototypeMethod(tpl, "start", Start);
     Nan::SetPrototypeMethod(tpl, "move", Move);
+    Nan::SetPrototypeMethod(tpl, "search", Search);
+    Nan::SetPrototypeMethod(tpl, "legal", Legal);
     Nan::SetPrototypeMethod(tpl, "print", Print);
 
     constructor().Reset(Nan::GetFunction(tpl).ToLocalChecked());
@@ -62,7 +64,6 @@ class Komachan : public Nan::ObjectWrap {
   static NAN_METHOD(Start) {
     Komachan* obj = ObjectWrap::Unwrap<Komachan>(info.This());
     obj->game.game_initialize();
-    obj->game.get_board()->printZobristHashed();
     info.GetReturnValue().SetNull();
   }
 
@@ -103,9 +104,129 @@ class Komachan : public Nan::ObjectWrap {
 
     Nan::Utf8String piece_(piece);
 
+    double color = 0;
+    double promote = 0;
+    std::string cap;
+    double isAttack;
 
-    obj->game.move(fromX, fromY, toX, toY, *piece_);
-    info.GetReturnValue().SetNull();
+    if (! obj->game.move(&fromX, &fromY, &toX, &toY, *piece_, &color, &promote, &cap, &isAttack) ){
+      Nan::ThrowTypeError("Wrong move");
+    }
+
+    Nan::Set( move,
+              Nan::New<v8::String>("color").ToLocalChecked(),
+              Nan::New<v8::Number>((double)(color))
+    );
+    Nan::Set( move,
+              Nan::New<v8::String>("promote").ToLocalChecked(),
+              Nan::New<v8::Boolean>(promote)
+    );
+    Nan::Set( move,
+              Nan::New<v8::String>("capture").ToLocalChecked(),
+              Nan::New<v8::String>(cap).ToLocalChecked()
+    );
+    Nan::Set( move,
+              Nan::New<v8::String>("isAttack").ToLocalChecked(),
+              Nan::New<v8::Boolean>(isAttack)
+    );
+    info.GetReturnValue().Set(move);
+  }
+
+  static NAN_METHOD(Search) {
+    Komachan* obj = ObjectWrap::Unwrap<Komachan>(info.This());
+    double fromX, fromY, toX, toY, color, promote, isAttack;
+    std::string piece, capture;
+    if (obj->game.search(&fromX, &fromY, &toX, &toY, &piece, &color, &promote, &capture, &isAttack) < 0 ) {
+      Nan::ThrowTypeError("Failed search");
+    }
+    v8::Local<v8::Object> move = Nan::New<v8::Object>();
+    v8::Local<v8::Object> from = Nan::New<v8::Object>();
+    v8::Local<v8::Object> to = Nan::New<v8::Object>();
+
+    Nan::Set(
+      from,
+      Nan::New<v8::String>("x").ToLocalChecked(),
+      Nan::New<v8::Number>(fromX)
+    );
+
+    Nan::Set(
+      from,
+      Nan::New<v8::String>("y").ToLocalChecked(),
+      Nan::New<v8::Number>(fromY)
+    );
+
+    Nan::Set(
+      to,
+      Nan::New<v8::String>("x").ToLocalChecked(),
+      Nan::New<v8::Number>(toX)
+    );
+
+    Nan::Set(
+      to,
+      Nan::New<v8::String>("y").ToLocalChecked(),
+      Nan::New<v8::Number>(toY)
+    );
+
+    Nan::Set(
+      move,
+      Nan::New<v8::String>("from").ToLocalChecked(),
+      from
+    );
+
+    Nan::Set(
+      move,
+      Nan::New<v8::String>("to").ToLocalChecked(),
+      to
+    );
+
+    Nan::Set(
+      move,
+      Nan::New<v8::String>("piece").ToLocalChecked(),
+      Nan::New<v8::String>(piece).ToLocalChecked()
+    );
+
+    Nan::Set(
+      move,
+      Nan::New<v8::String>("promote").ToLocalChecked(),
+      Nan::New<v8::Boolean>(promote)
+    );
+
+    Nan::Set(
+      move,
+      Nan::New<v8::String>("capture").ToLocalChecked(),
+      Nan::New<v8::String>(capture).ToLocalChecked()
+    );
+
+    Nan::Set(
+      move,
+      Nan::New<v8::String>("isAttack").ToLocalChecked(),
+      Nan::New<v8::Boolean>(isAttack)
+    );
+    info.GetReturnValue().Set(move);
+  }
+
+  static NAN_METHOD(Legal) {
+    Komachan* obj = ObjectWrap::Unwrap<Komachan>(info.This());
+    unsigned int lmoves[ SIZE_LEGALMOVES ];
+    double fromX, fromY, toX, toY;
+    std::string piece;
+    int nmove = obj->game.get_board()->gen_legalmoves(lmoves);
+    v8::Local<v8::Array> lmovesArray = Nan::New<v8::Array>();
+    for ( int i=0; i<nmove; i++) {
+      obj->game.legal(lmoves[i], &fromX, &fromY, &toX, &toY, &piece);
+      v8::Local<v8::Object> lmove = Nan::New<v8::Object>();
+      v8::Local<v8::Object> from = Nan::New<v8::Object>();
+      v8::Local<v8::Object> to = Nan::New<v8::Object>();
+      Nan::Set(from, Nan::New<v8::String>("x").ToLocalChecked(), Nan::New<v8::Number>(fromX));
+      Nan::Set(from, Nan::New<v8::String>("y").ToLocalChecked(), Nan::New<v8::Number>(fromY));
+      Nan::Set(to, Nan::New<v8::String>("x").ToLocalChecked(), Nan::New<v8::Number>(toX));
+      Nan::Set(to, Nan::New<v8::String>("y").ToLocalChecked(), Nan::New<v8::Number>(toY));
+      Nan::Set(lmove, Nan::New<v8::String>("from").ToLocalChecked(), from);
+      Nan::Set(lmove, Nan::New<v8::String>("to").ToLocalChecked(), to);
+      Nan::Set(lmove, Nan::New<v8::String>("piece").ToLocalChecked(), Nan::New<v8::String>(piece).ToLocalChecked());
+      Nan::Set(lmovesArray, Nan::New<v8::Number>(i), lmove);
+    }
+    info.GetReturnValue().Set(lmovesArray);
   }
 
   static NAN_METHOD(Print) {
