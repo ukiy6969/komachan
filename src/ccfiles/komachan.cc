@@ -39,7 +39,9 @@ class Komachan : public Nan::ObjectWrap {
  private:
   explicit Komachan(std::string binPath = "./setting") : game(binPath), io(&game) {
   }
-  ~Komachan() {}
+  ~Komachan() {
+    std::cout << "delete komachan" << std::endl;
+  }
 
   static NAN_METHOD(New) {
     if (info.IsConstructCall()) {
@@ -110,7 +112,8 @@ class Komachan : public Nan::ObjectWrap {
     double isAttack;
 
     if (! obj->game.move(&fromX, &fromY, &toX, &toY, *piece_, &color, &promote, &cap, &isAttack) ){
-      Nan::ThrowTypeError("Wrong move");
+      info.GetReturnValue().SetUndefined();
+      return;
     }
 
     Nan::Set( move,
@@ -137,7 +140,8 @@ class Komachan : public Nan::ObjectWrap {
     double fromX, fromY, toX, toY, color, promote, isAttack;
     std::string piece, capture;
     if (obj->game.search(&fromX, &fromY, &toX, &toY, &piece, &color, &promote, &capture, &isAttack) < 0 ) {
-      Nan::ThrowTypeError("Failed search");
+      info.GetReturnValue().SetUndefined();
+      return;
     }
     v8::Local<v8::Object> move = Nan::New<v8::Object>();
     v8::Local<v8::Object> from = Nan::New<v8::Object>();
