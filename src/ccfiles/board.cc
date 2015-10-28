@@ -1782,7 +1782,7 @@ void Board::make_move_b( unsigned int move )
 
   if( from == move_drop )
     {
-      UPDATE_ZOBRIST(HAND_INFO_RAND[black][B_HAND(type)][type]);
+      UPDATE_ZOBRIST(HAND_INFO_RAND[black][B_HAND(type & mask_nopro)][type & mask_nopro]);
       UPDATE_ZOBRIST(PIECE_INFO_RAND[type][to]);
       B_HAND_A -= HAND_ADD( type & mask_nopro );
       BB_N( type ) |= Bit( to );
@@ -1790,7 +1790,7 @@ void Board::make_move_b( unsigned int move )
       nOccupiedB  ^= Bit( to );
       Occupied0   ^= Bit( to );
 
-      UPDATE_ZOBRIST(HAND_INFO_RAND[black][B_HAND(type)][type]);
+      UPDATE_ZOBRIST(HAND_INFO_RAND[black][B_HAND(type & mask_nopro)][type & mask_nopro]);
     }
   else if( cap )
     {
@@ -1971,7 +1971,7 @@ void Board::unmake_move_b()
 
   if( from == move_drop )
     {
-      UPDATE_ZOBRIST(HAND_INFO_RAND[black][B_HAND(type)][type]);
+      UPDATE_ZOBRIST(HAND_INFO_RAND[black][B_HAND(type & mask_nopro)][type & mask_nopro]);
       UPDATE_ZOBRIST(PIECE_INFO_RAND[type][to]);
       B_HAND_A += HAND_ADD( type & mask_nopro );
       BB_N( type ) ^= Bit( to );
@@ -1979,7 +1979,7 @@ void Board::unmake_move_b()
       nOccupiedB ^= Bit( to );
       Occupied0  ^= Bit( to );
 
-      UPDATE_ZOBRIST(HAND_INFO_RAND[black][B_HAND(type)][type]);
+      UPDATE_ZOBRIST(HAND_INFO_RAND[black][B_HAND(type & mask_nopro)][type & mask_nopro]);
     }
   else if( cap_type )
     {
@@ -2263,4 +2263,16 @@ int Board::w_hand(int piece){
 }
 int Board::b_hand(int piece){
     return (int)((B_HAND_A >> ((piece)*2)) & b0011);
+}
+
+void Board::print_tpt(){
+  auto itr = TPT.begin();
+  while(itr != TPT.end()){
+    std::cout << (*itr).first << ":" << (*itr).second.eval << std::endl;
+  }
+}
+
+void Board::set_tpt(unsigned long long key, int depth, short eval) {
+  tpt_v new_val = { depth, eval, 0};
+  tpt[key] = new_val;
 }
