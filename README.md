@@ -2,6 +2,10 @@
 
 ## This is developing
 
+## 電気通信大学の情報学工房
+[ここにある](http://pr.cei.uec.ac.jp/kobo2015/index.php?%BB%D7%B9%CD%A5%B2%A1%BC%A5%E0AI%A4%F2%BA%EE%A4%ED%A4%A6%A1%AA)
+IAをもとに開発を進めています。
+
 
 ## license
 ５五将棋AIの基本ライブラリです。
@@ -56,4 +60,3 @@ boardによって管理されるゲーム状態を用いて、AIとの対戦を�
 
 -search.c
 探索と盤面の静的評価を行う
-
