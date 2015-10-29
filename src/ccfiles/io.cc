@@ -1,4 +1,5 @@
 #include "io.h"
+#include <iostream>
 
 #define DELIM   " "
 
@@ -43,6 +44,10 @@ Io::Io(Game* g){
     { file_log = fopen( str_file, "w" ); }
 }
 
+Io::~Io() {
+  delete game;
+}
+
 Board* Io::get_board(){
   return board;
 }
@@ -55,7 +60,7 @@ int Io::cmd_prompt(){
   char buf[256];
   const char *token;
   char *last;
-  int count_byte, ret;
+  int count_byte, ret = 0;
 
   if( board->get_turn() && !server_mode)
     {
@@ -86,7 +91,7 @@ int Io::cmd_prompt(){
     { back(); }
   else if( !strcmp( token, "move" ) )
     { manual_move( &last ); }
-  else if( !server_mode && !strcmp( token, "search" ) || !strcmp( token, "s" ) )
+  else if( !server_mode && (!strcmp( token, "search" ) || !strcmp( token, "s" )) )
     { search_start(); }
   else if( !strcmp( token, "new" )  )
     { new_game(); }
@@ -176,6 +181,7 @@ void Io::search_start()
       return;
     }
   out_position();
+  out("search time = %d\n", iret);
   return;
 }
 
@@ -468,9 +474,20 @@ void Io::out_board(){
       if( board->w_hand(i) > 0 )
         out(" %s%d", ch_piece[i], board->w_hand(i) );
     }
+  out("\ncal_zobrist_hash=%llu\n", board->game.zobrist );
+  out("get_zobrist_hash=%llu\n", board->get_zobrist() );
+  //print_tpt();
   out("\n\n");
 
   return;
+}
+
+void Io::print_tpt() {
+  auto itr = board->tpt.begin();
+  while(itr != board->tpt.end()){
+    out("zobrist_has=%llu eval=%d\n", (*itr).first, (*itr).second.eval);
+    ++itr;
+  }
 }
 
 void Io::out_server(){

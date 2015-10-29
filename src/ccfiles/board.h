@@ -8,6 +8,8 @@
 //move: 指し手
 //hand: 持ち駒
 
+#include <iostream>
+#include <unordered_map>
 
 #define RECORD_SIZE        256
 #define SIZE_LEGALMOVES    256
@@ -23,6 +25,7 @@ struct tree
   int sq_bking; //黒の玉の位置
   char turn; //現在の手番
   short n_ply; //現在の手数
+  unsigned long long zobrist;
 };
 
 //指し手の履歴ひとつ分を示す構造体
@@ -31,10 +34,18 @@ typedef struct
   unsigned int move;
 } hist_t;
 
+// トランスポジションのバリュー
+typedef struct _tpt_v
+{
+  int depth;     // 探索の深さ
+  short eval;             // 評価値
+  int board_cnt; // 千日手対策 同じ盤面が何回現れたかカウント
+} tpt_v;
+
 //gameに，ゲームの全状態を格納しておく。
 //historyは，指し手の配列。これまでの手を登録する?
-extern tree_t game;
-extern hist_t history[ RECORD_SIZE ];
+//extern tree_t game; 使わない
+//extern hist_t history[ RECORD_SIZE ]; 使わない
 //2進数を表現する.binary
 enum { b0000, b0001, b0010, b0011, b0100, b0101, b0110, b0111,
        b1000, b1001, b1010, b1011, b1100, b1101, b1110, b1111,
@@ -168,6 +179,10 @@ enum{
 //始めにビットが立っている位置を取得する
 #define FIRSTONE(bb)   (31 - __builtin_clz( bb )) /* ret -1: bb = 0 */
 
+#define ZOBRIST        (game.zobrist)
+#define UPDATE_ZOBRIST( u )  (update_zobrist(u))
+#define TPT             (tpt)
+
 /* move
   ........ ........ ...xxxxx piece to move
   ........ ......xx xxx..... starting square ( 25-> drop )
@@ -205,6 +220,7 @@ enum{
 //指し手を反映させるマクロ
 //現在の手番のプレイヤのmake_moveを呼び出す．
 #define MAKE_MOVE(move)       TURN ? make_move_b( move ) : make_move_w( move );
+#define UNMAKE_MOVE           TURN ? unmake_move_w() : unmake_move_b();
 //手番を入れ替える．black^blackならwhiteに。white^blackならblackになる．
 #define FLIP_TURN             TURN ^= black;
 
@@ -234,8 +250,16 @@ public:
   ~Board();
   tree_t game;
   hist_t history[ RECORD_SIZE ];
+
+  // トランスポジションテーブル
+  std::unordered_map<unsigned long long, tpt_v> tpt;
   static const int Attack_Rook_shift[];
   static const int Attack_Bishop_shift[];
+
+  // ゾブリストハッシュ
+  unsigned long long PIECE_INFO_RAND[32][32];
+  unsigned long long HAND_INFO_RAND[2][4][8];
+  unsigned long long TURN_RAND[2];
 
   //calc_occupied_sq()にてbb_mask初期化
   //make_move_wにて，駒の移動先にて
@@ -246,13 +270,14 @@ public:
   //ここからライブラリの用意する関数群
 
   //ゲーム状態の変更
-  int starting_initialize(char* bin_path); //利き情報の初期化
+  int starting_initialize(std::string binPath); //利き情報の初期化
   void clear_game(); //盤面・手番・持ち駒を初期状態にリセット
   void make_move_w( unsigned int move );
   void make_move_b( unsigned int move );
   void unmake_move_w( );
   void unmake_move_b( );
   //指し手生成に関わる関数
+  int is_attack(unsigned int *attack_pieces);
   int gen_legalmoves( unsigned legalmoves[] );
   int gen_evasion_w( unsigned int moves[], int count, int nAttacks,
                      unsigned int attack_pieces, unsigned int pin[] );
@@ -291,4 +316,12 @@ public:
   void unmake_move();
   int w_hand(int piece);
   int b_hand(int piece);
+  // Zobrist method
+  int zobrist_create(std::string zobrist_name);
+  int zobrist_init(std::string zobrist_path);
+  void printZobristHashed();
+  void update_zobrist(unsigned long long);
+  unsigned long long get_zobrist();
+  void set_tpt(unsigned long long key, int depth, short value);
+  void print_tpt();
 };

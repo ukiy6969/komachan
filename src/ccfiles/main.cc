@@ -23,8 +23,12 @@ int main( int argc, char *argv[] )
     }
   }
 
-  if( io->get_board()->starting_initialize(bin_path) < 0 )
-    { exit(1); }
+  if (bin_path == NULL) {
+    bin_path = "./setting";
+  }
+
+  std::string binPath(bin_path);
+
   game->game_initialize();
 
   io->out_position();
