@@ -8,5 +8,6 @@ test
 komachan
 src/lib/**/*
 *.bin
+build
 _src/**/*
 src/game
