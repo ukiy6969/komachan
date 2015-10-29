@@ -14,7 +14,10 @@
     "url": "git+https://github.com/ukiy/komachan.git"
   },
   "keywords": [
-    "js"
+    "js",
+    "node",
+    "IA",
+    "game"
   ],
   "author": "ukiy",
   "license": "ISC",
@@ -22,6 +25,7 @@
     "url": "https://github.com/ukiy/komachan/issues"
   },
   "homepage": "https://github.com/ukiy/komachan#readme",
+  "gypfile": true,
   "devDependencies": {},
   "dependencies": {
     "bindings": "^1.2.1",

@@ -7,11 +7,11 @@
     {
       'target_name': 'komachan',
       'sources': [
-        'src/ccfiles/komachan.cc',
-        'src/ccfiles/game.cc',
-        'src/ccfiles/board.cc',
-        'src/ccfiles/search.cc',
-        'src/ccfiles/io.cc'
+        'src/komachan.cc',
+        'src/game.cc',
+        'src/board.cc',
+        'src/search.cc',
+        'src/io.cc'
       ],
       'include_dirs': [
         "<!(node -e \"require('nan')\")"

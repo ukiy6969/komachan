@@ -91,11 +91,11 @@ INCS_Release := \
 	-I$(srcdir)/node_modules/nan
 
 OBJS := \
-	$(obj).target/$(TARGET)/src/ccfiles/komachan.o \
-	$(obj).target/$(TARGET)/src/ccfiles/game.o \
-	$(obj).target/$(TARGET)/src/ccfiles/board.o \
-	$(obj).target/$(TARGET)/src/ccfiles/search.o \
-	$(obj).target/$(TARGET)/src/ccfiles/io.o
+	$(obj).target/$(TARGET)/src/komachan.o \
+	$(obj).target/$(TARGET)/src/game.o \
+	$(obj).target/$(TARGET)/src/board.o \
+	$(obj).target/$(TARGET)/src/search.o \
+	$(obj).target/$(TARGET)/src/io.o
 
 # Add to the list of files we specially track dependencies for.
 all_deps += $(OBJS)

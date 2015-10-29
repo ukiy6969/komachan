@@ -8,3 +8,4 @@ test
 komachan
 src/lib/**/*
 *.bin
+_src/**/*
