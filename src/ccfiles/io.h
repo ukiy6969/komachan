@@ -37,4 +37,5 @@ public:
   void out_board();
   void out_server();
   void out_move_string(char *str);
+  void print_tpt();
 };

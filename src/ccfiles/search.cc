@@ -16,13 +16,14 @@ int Search::search_root()
   int best;
   unsigned int nmove = 0, imove;
   int depth = SEARCH_DEPTH;
-  int d, start, end;
+  int d;
   int maxtime = SEARCH_MAX_TIME;
   int search_time;
   short value;
   short beta, max = 0;
   unsigned int legalmoves[ SIZE_LEGALMOVES ];
   short evals[ SIZE_LEGALMOVES ];
+  clock_t start, end;
 
   nmove = board->gen_legalmoves( legalmoves );
 
@@ -54,7 +55,13 @@ int Search::search_root()
     for( imove = 0; imove < nmove; imove++ ) {
 
         board->make_move( legalmoves[ imove ] );
-        value = -search( -beta, -max, depth -1, 1 );
+        if (board->tpt.count(board->game.zobrist) != 0) {
+          value = board->tpt[board->game.zobrist].eval;
+        } else {
+          value = -search( -beta, -max, d -1, 1 );
+          board->set_tpt(board->game.zobrist, d, value);
+        }
+        //value = -search( -beta, -max, depth -1, 1 );
         evals[imove] = value;
         board->unmake_move();
 
@@ -70,38 +77,21 @@ int Search::search_root()
       move_ordering(evals, legalmoves, nmove);
     }
 
-    if ( ((double)clock() - start)/CLOCKS_PER_SEC > maxtime) {
+    /*
+    if ( (((double)clock() - start)/CLOCKS_PER_SEC) > maxtime) {
       break;
     }
+    */
 
   }
 
   end = clock();
 
-  search_time = (((double)end - start)/CLOCKS_PER_SEC);
+  search_time = (double)(end - start);
+  std::cout << search_time << std::endl;
 
   board->make_move( legalmoves[ best ] );
   return search_time;
-}
-
-inline void move_ordering(short *evals, unsigned int *legal_moves, unsigned int n) {
-  /** insert sort **/
-  short tmp_e;
-  unsigned int i, j, tmp_l;
-  for (i = 1; i < n; i++) {
-    tmp_e = evals[i];
-    tmp_l = legal_moves[i];
-    if (evals[i - 1] < tmp_e) {
-      j = i;
-      do {
-        evals[j] = evals[j - 1];
-        legal_moves[j] = legal_moves[j - 1];
-        j--;
-      } while(j > 0 && evals[j - 1] < tmp_e);
-      evals[j] = tmp_e;
-      legal_moves[j] = tmp_l;
-    }
-  }
 }
 
 int Search::search( short alpha, short beta, int depth, int ply )
@@ -127,7 +117,13 @@ int Search::search( short alpha, short beta, int depth, int ply )
   for( imove = 0; imove < nmove; imove++ )
     {
       board->make_move( legalmoves[ imove ] );
-      value = -search( -beta, -max, depth -1, ply +1 );
+      if (board->tpt.count(board->game.zobrist) != 0) {
+        value = board->tpt[board->game.zobrist].eval;
+      } else {
+        value = -search( -beta, -max, depth -1, 1 );
+        board->set_tpt(board->game.zobrist, depth, value);
+      }
+      //value = -search( -beta, -max, depth -1, 1 );
       board->unmake_move();
 
       if( value >= beta )
@@ -165,4 +161,25 @@ short Search::evaluate()
   score += ( board->w_hand( rook )   - board->b_hand( rook ) )   * 390;
 
   return board->get_turn() ? -score: score;
+}
+
+
+inline void move_ordering(short *evals, unsigned int *legal_moves, unsigned int n) {
+  /** insert sort **/
+  short tmp_e;
+  unsigned int i, j, tmp_l;
+  for (i = 1; i < n; i++) {
+    tmp_e = evals[i];
+    tmp_l = legal_moves[i];
+    if (evals[i - 1] < tmp_e) {
+      j = i;
+      do {
+        evals[j] = evals[j - 1];
+        legal_moves[j] = legal_moves[j - 1];
+        j--;
+      } while(j > 0 && evals[j - 1] < tmp_e);
+      evals[j] = tmp_e;
+      legal_moves[j] = tmp_l;
+    }
+  }
 }

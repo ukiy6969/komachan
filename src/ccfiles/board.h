@@ -9,6 +9,7 @@
 //hand: 持ち駒
 
 #include <iostream>
+#include <unordered_map>
 
 #define RECORD_SIZE        256
 #define SIZE_LEGALMOVES    256
@@ -32,6 +33,14 @@ typedef struct
 {
   unsigned int move;
 } hist_t;
+
+// トランスポジションのバリュー
+typedef struct _tpt_v
+{
+  int depth;     // 探索の深さ
+  short eval;             // 評価値
+  int board_cnt; // 千日手対策 同じ盤面が何回現れたかカウント
+} tpt_v;
 
 //gameに，ゲームの全状態を格納しておく。
 //historyは，指し手の配列。これまでの手を登録する?
@@ -172,6 +181,7 @@ enum{
 
 #define ZOBRIST        (game.zobrist)
 #define UPDATE_ZOBRIST( u )  (update_zobrist(u))
+#define TPT             (tpt)
 
 /* move
   ........ ........ ...xxxxx piece to move
@@ -240,6 +250,9 @@ public:
   ~Board();
   tree_t game;
   hist_t history[ RECORD_SIZE ];
+
+  // トランスポジションテーブル
+  std::unordered_map<unsigned long long, tpt_v> tpt;
   static const int Attack_Rook_shift[];
   static const int Attack_Bishop_shift[];
 
@@ -309,4 +322,6 @@ public:
   void printZobristHashed();
   void update_zobrist(unsigned long long);
   unsigned long long get_zobrist();
+  void set_tpt(unsigned long long key, int depth, short value);
+  void print_tpt();
 };

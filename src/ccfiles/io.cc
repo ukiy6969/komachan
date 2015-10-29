@@ -181,6 +181,7 @@ void Io::search_start()
       return;
     }
   out_position();
+  out("search time = %d\n", iret);
   return;
 }
 
@@ -475,9 +476,18 @@ void Io::out_board(){
     }
   out("\ncal_zobrist_hash=%llu\n", board->game.zobrist );
   out("get_zobrist_hash=%llu\n", board->get_zobrist() );
+  //print_tpt();
   out("\n\n");
 
   return;
+}
+
+void Io::print_tpt() {
+  auto itr = board->tpt.begin();
+  while(itr != board->tpt.end()){
+    out("zobrist_has=%llu eval=%d\n", (*itr).first, (*itr).second.eval);
+    ++itr;
+  }
 }
 
 void Io::out_server(){
