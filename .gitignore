@@ -9,3 +9,4 @@ komachan
 src/lib/**/*
 *.bin
 _src/**/*
+src/game
