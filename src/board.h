@@ -32,6 +32,7 @@ struct tree
 typedef struct
 {
   unsigned int move;
+  unsigned long long zobrist;
 } hist_t;
 
 // トランスポジションのバリュー
@@ -324,4 +325,5 @@ public:
   unsigned long long get_zobrist();
   void set_tpt(unsigned long long key, int depth, short value);
   void print_tpt();
+  int get_board_show_cnt();
 };

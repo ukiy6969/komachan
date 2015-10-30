@@ -5,10 +5,7 @@ void close_program(Game* game);
 int main( int argc, char *argv[] )
 {
   int ret;
-  char* bin_path;
-  Game* game = new Game();
-  Io* io = new Io(game);
-  Board* board = io->get_board();
+  std::string bin_path;
 
   if (argc > 1) {
     for(int i=1; i<argc; i++){
@@ -23,10 +20,13 @@ int main( int argc, char *argv[] )
     }
   }
 
-  if (bin_path == NULL) {
-    bin_path = "./setting";
+  if (bin_path.empty()) {
+    bin_path = "";
   }
 
+  Game* game = new Game();
+  Io* io = new Io(game);
+  Board* board = io->get_board();
   std::string binPath(bin_path);
 
   game->game_initialize();

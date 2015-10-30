@@ -1750,13 +1750,14 @@ void Board::make_move_w( unsigned int move )
   SQ_W_KING = FirstOne( BB_W_KING );
   assert( SQ_W_KING >= 0 );
 
+  UPDATE_ZOBRIST(TURN_RAND[black]);
+  UPDATE_ZOBRIST(TURN_RAND[white]);
   history[N_PLY].move =
     ( move & ~move_mask_captured ) + CAPTURED_2_MOVE( cap_type );
 
-  UPDATE_ZOBRIST(TURN_RAND[black]);
-  UPDATE_ZOBRIST(TURN_RAND[white]);
   FLIP_TURN;
   N_PLY ++;
+  history[N_PLY].zobrist = get_zobrist();
   /*
   std::cout << " from " << from
             << " to "   << to
@@ -1852,14 +1853,14 @@ void Board::make_move_b( unsigned int move )
   SQ_B_KING = FirstOne( BB_B_KING );
   assert( SQ_B_KING >= 0 );
 
+  UPDATE_ZOBRIST(TURN_RAND[black]);
+  UPDATE_ZOBRIST(TURN_RAND[white]);
   history[N_PLY].move =
     ( move & ~move_mask_captured ) + CAPTURED_2_MOVE( cap_type );
 
-  UPDATE_ZOBRIST(TURN_RAND[black]);
-  UPDATE_ZOBRIST(TURN_RAND[white]);
   FLIP_TURN;
   N_PLY ++;
-
+  history[N_PLY].zobrist = get_zobrist();
   /*
   std::cout << " from " << from
             << " to "   << to
@@ -2182,6 +2183,7 @@ void Board::clear_game()
   calc_occupied_sq();
 
   ZOBRIST = get_zobrist();
+  history[0].zobrist = get_zobrist();
 
   return;
 }
@@ -2275,4 +2277,16 @@ void Board::print_tpt(){
 void Board::set_tpt(unsigned long long key, int depth, short eval) {
   tpt_v new_val = { depth, eval, 0};
   tpt[key] = new_val;
+}
+
+int Board::get_board_show_cnt() {
+  if (N_PLY <= 0) { return 0; }
+  unsigned long long check = history[N_PLY].zobrist;
+  int cnt = 0;
+  for (int i = 0; i < N_PLY ; i++) {
+    if (history[i].zobrist == check) {
+      cnt++;
+    }
+  }
+  return cnt;
 }
