@@ -55,7 +55,7 @@ int Search::search_root()
     for( imove = 0; imove < nmove; imove++ ) {
 
         board->make_move( legalmoves[ imove ] );
-        if (board->tpt.count(board->game.zobrist) != 0) {
+        if (board->tpt.count(board->game.zobrist) != 0 && board->tpt[board->game.zobrist].depth >= d) {
           value = board->tpt[board->game.zobrist].eval;
         } else {
           value = -search( -beta, -max, d -1, 1 );
@@ -117,7 +117,7 @@ int Search::search( short alpha, short beta, int depth, int ply )
   for( imove = 0; imove < nmove; imove++ )
     {
       board->make_move( legalmoves[ imove ] );
-      if (board->tpt.count(board->game.zobrist) != 0) {
+      if (board->tpt.count(board->game.zobrist) != 0 && board->tpt[board->game.zobrist].depth >= depth) {
         value = board->tpt[board->game.zobrist].eval;
       } else {
         value = -search( -beta, -max, depth -1, 1 );
