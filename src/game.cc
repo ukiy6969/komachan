@@ -27,6 +27,7 @@ void Game::game_initialize(){
   if ( _board->zobrist_init(binPath) < 0 ) {
     exit(1);
   }
+  //_board->printZobristHashed();
   _board->clear_game();
   if ( _board->starting_initialize(binPath) < 0 ) {
     exit(1);
