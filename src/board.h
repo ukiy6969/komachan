@@ -10,6 +10,7 @@
 
 #include <iostream>
 #include <unordered_map>
+#include <fstream>   // ifstream, ofstream
 
 #define RECORD_SIZE        256
 #define SIZE_LEGALMOVES    256
@@ -325,5 +326,7 @@ public:
   unsigned long long get_zobrist();
   void set_tpt(unsigned long long key, int depth, short value);
   void print_tpt();
+  void write_tpt(std::string binPath);
+  void read_tpt(std::string binPath);
   int get_board_show_cnt();
 };
