@@ -40,7 +40,6 @@ typedef struct _tpt_v
 {
   int depth;     // 探索の深さ
   short eval;             // 評価値
-  int board_cnt; // 千日手対策 同じ盤面が何回現れたかカウント
 } tpt_v;
 
 //gameに，ゲームの全状態を格納しておく。
