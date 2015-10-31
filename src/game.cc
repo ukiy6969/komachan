@@ -25,11 +25,18 @@ Search* Game::get_search(){
 
 void Game::game_initialize(){
   if ( _board->zobrist_init(binPath) < 0 ) {
+    std::cout << "could not load Zobrist" << std::endl;
     exit(1);
   }
   //_board->printZobristHashed();
   _board->clear_game();
   if ( _board->starting_initialize(binPath) < 0 ) {
+    std::cout << "could not load BB_Attack" << std::endl;
+    exit(1);
+  }
+  if ( !_board->zobrist_check() ) {
+    _board->printZobristHashed();
+    std::cout << "zobrist is duplicate" << std::endl;
     exit(1);
   }
 }

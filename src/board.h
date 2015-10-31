@@ -320,6 +320,7 @@ public:
   // Zobrist method
   int zobrist_create(std::string zobrist_name);
   int zobrist_init(std::string zobrist_path);
+  int zobrist_check();
   void printZobristHashed();
   void update_zobrist(unsigned long long);
   unsigned long long get_zobrist();

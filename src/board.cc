@@ -95,12 +95,113 @@ int Board::zobrist_init(std::string binPath) {
     }
   }
   for(i = 0; i < 2; i++) {
-    FILE_READ( HAND_INFO_RAND[i] , 1);
+    FILE_READ( &TURN_RAND[i] , 1);
   }
   return fclose(fp) == 0;
 }
 
 #undef FILE_READ
+
+int Board::zobrist_check() {
+  int i,j,k;
+  int a,b,c;
+  int checkCnt;
+  unsigned long long check;
+  for(i = 0; i < 32; i++) {
+    for(j = 0; j < 32; j++) {
+      check = PIECE_INFO_RAND[i][j];
+      checkCnt = 0;
+      for(a = 0; a < 32; a++) {
+        for(b = 0; b < 32; b++) {
+          if (check == PIECE_INFO_RAND[a][b]) {
+            checkCnt++;
+          }
+        }
+      }
+      for(a = 0; a < 2; a++) {
+        for(b = 0; b < 4; b++) {
+          for (c = 0; c < 8; c++){
+            if (check == HAND_INFO_RAND[a][b][c]) {
+              checkCnt++;
+            }
+          }
+        }
+      }
+      for(a = 0; a < 2; a++) {
+        if (check == TURN_RAND[a]) {
+          checkCnt++;
+        }
+      }
+      if (checkCnt > 1) {
+        return 0;
+      }
+    }
+  }
+
+  for(i = 0; i < 2; i++) {
+    for(j = 0; j < 4; j++) {
+      for (k = 0; k < 8; k++){
+        check = HAND_INFO_RAND[i][j][k];
+        checkCnt = 0;
+        for(a = 0; a < 32; a++) {
+          for(b = 0; b < 32; b++) {
+            if (check == PIECE_INFO_RAND[a][b]) {
+              checkCnt++;
+            }
+          }
+        }
+        for(a = 0; a < 2; a++) {
+          for(b = 0; b < 4; b++) {
+            for (c = 0; c < 8; c++){
+              if (check == HAND_INFO_RAND[a][b][c]) {
+                checkCnt++;
+              }
+            }
+          }
+        }
+        for(a = 0; a < 2; a++) {
+          if (check == TURN_RAND[a]) {
+            checkCnt++;
+          }
+        }
+        if (checkCnt > 1) {
+          return 0;
+        }
+      }
+    }
+  }
+
+  for(i = 0; i < 2; i++) {
+    check = TURN_RAND[i];
+    checkCnt = 0;
+    for(a = 0; a < 32; a++) {
+      for(b = 0; b < 32; b++) {
+        if (check == PIECE_INFO_RAND[a][b]) {
+          checkCnt++;
+        }
+      }
+    }
+    for(a = 0; a < 2; a++) {
+      for(b = 0; b < 4; b++) {
+        for (c = 0; c < 8; c++){
+          if (check == HAND_INFO_RAND[a][b][c]) {
+            checkCnt++;
+          }
+        }
+      }
+    }
+    for(a = 0; a < 2; a++) {
+      if (check == TURN_RAND[a]) {
+        checkCnt++;
+      }
+    }
+    if (checkCnt > 1) {
+      return 0;
+    }
+  }
+  return 1;
+
+}
 
 void Board::printZobristHashed() {
   int i,j,k;
