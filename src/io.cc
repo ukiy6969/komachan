@@ -45,7 +45,7 @@ Io::Io(Game* g){
 }
 
 Io::~Io() {
-  delete game;
+  //delete game;
 }
 
 Board* Io::get_board(){
