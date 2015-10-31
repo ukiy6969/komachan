@@ -5,8 +5,6 @@
   "private": false,
   "main": "index.js",
   "scripts": {
-    "install": "make",
-    "preinstall": "node-gyp rebuild",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
