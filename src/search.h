@@ -6,7 +6,7 @@
 
 class Search {
 private:
-  static const int SEARCH_DEPTH = 9;
+  static const int SEARCH_DEPTH = 7;
   static const int SCORE_MAX = 8100;
   static const int SCORE_MATED = (-SCORE_MAX);
   static const int SEARCH_MAX_TIME = 100000;
