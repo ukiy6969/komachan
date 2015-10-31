@@ -111,6 +111,7 @@ int Search::search( short alpha, short beta, int depth, int ply )
   for( imove = 0; imove < nmove; imove++ )
     {
       board->make_move( legalmoves[ imove ] );
+      /*
       if (board->get_board_show_cnt() >= 4) {
         value = -SCORE_MAX;
       }else
@@ -120,7 +121,8 @@ int Search::search( short alpha, short beta, int depth, int ply )
         value = -search( -beta, -max, depth -1, ply + 1 );
         board->set_tpt(board->game.zobrist, depth -1, value);
       }
-      //value = -search( -beta, -max, depth -1, ply + 1 );
+      */
+      value = -search( -beta, -max, depth -1, ply + 1 );
       board->unmake_move();
 
       if( value >= beta )
