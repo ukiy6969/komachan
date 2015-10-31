@@ -1,1 +1,0 @@
-cmd_Release/komachan.node := /usr/bin/clang++ -bundle -undefined dynamic_lookup -Wl,-search_paths_first -mmacosx-version-min=10.7 -arch x86_64 -L./Release  -o Release/komachan.node Release/obj.target/komachan/src/komachan.o Release/obj.target/komachan/src/game.o Release/obj.target/komachan/src/board.o Release/obj.target/komachan/src/search.o Release/obj.target/komachan/src/io.o 
