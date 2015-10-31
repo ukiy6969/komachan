@@ -1,8 +1,4 @@
 {
-  'make_global_settings': [
-    ['CXX','/usr/bin/clang++'],
-    ['LINK','/usr/bin/clang++'],
-  ],
   'targets': [
     {
       'target_name': 'komachan',
@@ -26,7 +22,7 @@
         ],
       ],
       'cflags' : [
-        '-stdlib=libc++'
+        '-std=c++11'
       ],
     }
   ]
