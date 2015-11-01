@@ -11,8 +11,8 @@ Game::Game(std::string bp): binPath(bp){
 }
 
 Game::~Game() {
-  //delete _board;
-  //delete _search;
+  delete _board;
+  delete _search;
 }
 
 Board* Game::get_board(){
