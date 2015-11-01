@@ -37,4 +37,5 @@ obj1.print();
 obj2.print();
 var move12 = obj1.search();
 console.log(move12);
+obj1.end();
 obj1.print();
