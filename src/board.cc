@@ -2381,6 +2381,38 @@ void Board::set_tpt(unsigned long long key, int depth, short eval) {
   tpt[key] = new_val;
 }
 
+void Board::write_tpt(std::string binPath) {
+  std::string tpt_bin_name = "/Tpt.bin";
+  std::string bp(binPath);
+  bp.append(tpt_bin_name);
+  std::ofstream ofs(bp.c_str(), std::ios_base::out | std::ios_base::binary);
+  if (ofs) {
+    auto itr = TPT.begin();
+    while(itr != TPT.end()){
+      ofs.write(reinterpret_cast<const char *>(&(*itr).first), sizeof((*itr).first));
+      ofs.write(reinterpret_cast<const char *>(&(*itr).second), sizeof((*itr).second));
+      ++itr;
+    }
+  }
+  ofs.close();
+}
+
+void Board::read_tpt(std::string binPath) {
+  std::string tpt_bin_name = "/Tpt.bin";
+  std::string bp(binPath);
+  bp.append(tpt_bin_name);
+  std::ifstream ifs(bp.c_str() ,std::ios_base::in | std::ios_base::binary);
+  if (ifs) {
+    std::pair<unsigned long long, tpt_v> tptv;
+    while(!ifs.eof()){
+      ifs.read(reinterpret_cast<char *>(&(tptv.first)), sizeof(tptv.first));
+      ifs.read(reinterpret_cast<char *>(&(tptv.second)), sizeof(tptv.second));
+      TPT.insert(tptv);
+    }
+  }
+  ifs.close();
+}
+
 int Board::get_board_show_cnt() {
   if (N_PLY <= 0) { return 0; }
   unsigned long long check = history[N_PLY].zobrist;

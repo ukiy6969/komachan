@@ -21,10 +21,10 @@ int main( int argc, char *argv[] )
   }
 
   if (bin_path.empty()) {
-    bin_path = "";
+    bin_path = ".";
   }
 
-  Game* game = new Game();
+  Game* game = new Game(bin_path);
   Io* io = new Io(game);
   Board* board = io->get_board();
   std::string binPath(bin_path);
