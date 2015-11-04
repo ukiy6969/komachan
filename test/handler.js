@@ -10,3 +10,7 @@ komaHandler.finish(function(mess){
 process.on('exit', function(){
   komaHandler.end();
 });
+
+process.on('SIGTSTP', function() {
+  console.log('Got SIGTSTP.');
+});
