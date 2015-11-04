@@ -108,9 +108,10 @@ unsigned int Game::move(double *_fromX, double *_fromY, double *_toX, double *_t
     }
 
   *_promote = (double)prom;
-  *_cap = _ch_piece_csa[cap_type];
   if (cap_type == 0) {
     *_cap = "";
+  } else {
+    *_cap = _ch_piece_csa[cap_type & ~mask_piece_color];
   }
 
   if (_board->is_attack(&attack_pieces)) {
