@@ -16,7 +16,7 @@ int Search::search_root()
    */
   int best;
   unsigned int nmove = 0, imove;
-  int depth = SEARCH_DEPTH;
+  int depth = searchDepth;
   int d;
   int maxtime = SEARCH_MAX_TIME;
   int search_time;

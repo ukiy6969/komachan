@@ -68,11 +68,19 @@ class Komachan : public Nan::ObjectWrap {
     Komachan* obj = ObjectWrap::Unwrap<Komachan>(info.This());
     if (info[0]->IsObject() ) {
       v8::Local<v8::Object> startObj = Nan::To<v8::Object>(info[0]).ToLocalChecked();
-      if (Nan::Has(startObj, Nan::New<v8::String>("useTpt").ToLocalChecked()).FromJust() ) {
-        int useTpt = Nan::To<int32_t>(
-                        Nan::Get(startObj, Nan::New<v8::String>("useTpt").ToLocalChecked()).ToLocalChecked()
-                      ).FromJust();
+      v8::Local<v8::String> useTptStr = Nan::New<v8::String>("useTpt").ToLocalChecked();
+      if (Nan::Has(startObj, useTptStr).FromJust() ) {
+        int useTpt = Nan::To<int32_t>(Nan::Get(startObj, useTptStr).ToLocalChecked()).FromJust();
         obj->game.get_search()->useTpt = useTpt;
+      }
+      v8::Local<v8::String> searchDepthStr = Nan::New<v8::String>("searchDepth").ToLocalChecked();
+      if (Nan::Has(startObj, searchDepthStr).FromJust() ) {
+        int searchDepth = Nan::To<int32_t>(Nan::Get(startObj, searchDepthStr).ToLocalChecked()).FromJust();
+        if (searchDepth > 0){
+          obj->game.get_search()->searchDepth = searchDepth;
+        }else {
+          obj->game.get_search()->searchDepth = obj->game.get_search()->SEARCH_DEPTH;
+        }
       }
     }
     obj->game.game_initialize();

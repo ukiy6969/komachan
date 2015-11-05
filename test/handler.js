@@ -2,7 +2,8 @@ var handler = require('../lib/komachanhandler');
 var komaHandler = new handler();
 
 komaHandler.start({
-  useTpt: 1
+  useTpt: 1,
+  searchDepth: 7
 });
 komaHandler.finish(function(mess){
   console.log(mess);
