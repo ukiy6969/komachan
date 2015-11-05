@@ -3,11 +3,14 @@
 Search::Search(Board* b){
   board = b;
   useTpt = 0;
+  searchDepth = SEARCH_DEPTH;
+  searchMaxTime = SEARCH_MAX_TIME;
+  searchSumTime = 0;
 }
 
 inline void move_ordering(short *evals, unsigned int *legal_moves, unsigned int n);
 
-int Search::search_root()
+double Search::search_root()
 {
   /*
     ret =  0: succeeded
@@ -18,8 +21,8 @@ int Search::search_root()
   unsigned int nmove = 0, imove;
   int depth = searchDepth;
   int d;
-  int maxtime = SEARCH_MAX_TIME;
-  int search_time;
+  double maxtime = searchMaxTime;
+  double search_time;
   short value;
   short beta, max = 0;
   unsigned int legalmoves[ SIZE_LEGALMOVES ];
@@ -76,19 +79,17 @@ int Search::search_root()
       move_ordering(evals, legalmoves, nmove);
     }
 
-    /*
-    if ( (((double)clock() - start)) > maxtime) {
+    if ( ((double)(clock() - start) / CLOCKS_PER_SEC) > maxtime) {
       break;
     }
-    */
 
 
   }
 
   end = clock();
 
-  search_time = (double)(end - start);
-  std::cout << search_time << std::endl;
+  search_time = (double)(end - start) / CLOCKS_PER_SEC;
+  searchSumTime += search_time;
 
   board->make_move( legalmoves[ best ] );
   return search_time;

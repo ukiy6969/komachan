@@ -78,8 +78,6 @@ class Komachan : public Nan::ObjectWrap {
         int searchDepth = Nan::To<int32_t>(Nan::Get(startObj, searchDepthStr).ToLocalChecked()).FromJust();
         if (searchDepth > 0){
           obj->game.get_search()->searchDepth = searchDepth;
-        }else {
-          obj->game.get_search()->searchDepth = obj->game.get_search()->SEARCH_DEPTH;
         }
       }
     }
@@ -157,7 +155,8 @@ class Komachan : public Nan::ObjectWrap {
     Komachan* obj = ObjectWrap::Unwrap<Komachan>(info.This());
     double fromX, fromY, toX, toY, color, promote, isAttack;
     std::string piece, capture;
-    if (obj->game.search(&fromX, &fromY, &toX, &toY, &piece, &color, &promote, &capture, &isAttack) < 0 ) {
+    double searchTime = -1;
+    if ( (searchTime = obj->game.search(&fromX, &fromY, &toX, &toY, &piece, &color, &promote, &capture, &isAttack)) < 0 ) {
       info.GetReturnValue().SetUndefined();
       return;
     }
@@ -223,6 +222,12 @@ class Komachan : public Nan::ObjectWrap {
       move,
       Nan::New<v8::String>("isAttack").ToLocalChecked(),
       Nan::New<v8::Boolean>(isAttack)
+    );
+
+    Nan::Set(
+      move,
+      Nan::New<v8::String>("searchTime").ToLocalChecked(),
+      Nan::New<v8::Number>(searchTime)
     );
     info.GetReturnValue().Set(move);
   }

@@ -131,8 +131,8 @@ unsigned int Game::move(double *_fromX, double *_fromY, double *_toX, double *_t
 
 }
 
-int Game::search(double *_fromX, double *_fromY, double *_toX, double *_toY, std::string *_piece, double *_color, double *_promote, std::string* _capture, double *_isAttack){
-  int time = _search->search_root();
+double Game::search(double *_fromX, double *_fromY, double *_toX, double *_toY, std::string *_piece, double *_color, double *_promote, std::string* _capture, double *_isAttack){
+  double search_time = _search->search_root();
   unsigned int move = _board->history[ _board->get_nply() - 1].move;
   unsigned int attack_pieces;
   int type_c = MOVE_TYPE( move );
@@ -180,7 +180,7 @@ int Game::search(double *_fromX, double *_fromY, double *_toX, double *_toY, std
   }
 
   *_color = _board->turn();
-  return time;
+  return search_time;
 }
 
 void Game::legal(const unsigned int& lmove, double *_fromX, double *_fromY, double *_toX, double *_toY, std::string *_piece) {
