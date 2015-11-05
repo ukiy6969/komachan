@@ -9,12 +9,14 @@ class Komachan : public Nan::ObjectWrap {
  public:
   static NAN_MODULE_INIT(Init) {
     v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(New);
-    tpl->InstanceTemplate()->SetInternalFieldCount(6);
+    tpl->InstanceTemplate()->SetInternalFieldCount(8);
 
     Nan::SetPrototypeMethod(tpl, "start", Start);
     Nan::SetPrototypeMethod(tpl, "move", Move);
     Nan::SetPrototypeMethod(tpl, "search", Search);
     Nan::SetPrototypeMethod(tpl, "legal", Legal);
+    Nan::SetPrototypeMethod(tpl, "getTpt", GetTpt);
+    Nan::SetPrototypeMethod(tpl, "getZobrist", GetZobrist);
     Nan::SetPrototypeMethod(tpl, "end", End);
     Nan::SetPrototypeMethod(tpl, "print", Print);
 
@@ -66,6 +68,7 @@ class Komachan : public Nan::ObjectWrap {
 
   static NAN_METHOD(Start) {
     Komachan* obj = ObjectWrap::Unwrap<Komachan>(info.This());
+    obj->game.game_initialize();
     if (info[0]->IsObject() ) {
       v8::Local<v8::Object> startObj = Nan::To<v8::Object>(info[0]).ToLocalChecked();
       v8::Local<v8::String> useTptStr = Nan::New<v8::String>("useTpt").ToLocalChecked();
@@ -80,8 +83,64 @@ class Komachan : public Nan::ObjectWrap {
           obj->game.get_search()->searchDepth = searchDepth;
         }
       }
+
+      v8::Local<v8::String> hashStr = Nan::New<v8::String>("hash").ToLocalChecked();
+      if ( Nan::Has(startObj, hashStr).FromJust() ) {
+        v8::Local<v8::Object> tpt = Nan::To<v8::Object>(
+          Nan::Get(startObj, hashStr).ToLocalChecked()
+        ).ToLocalChecked();
+
+        v8::Local<v8::String> pieceInfoRandStr = Nan::New<v8::String>("pieceInfoRand").ToLocalChecked();
+        if ( Nan::Has(tpt, pieceInfoRandStr).FromJust() ) {
+          v8::Local<v8::Array> pieceInfoRand = v8::Local<v8::Array>::Cast(
+            Nan::Get(tpt, pieceInfoRandStr).ToLocalChecked()
+          );
+          for (unsigned int i = 0; i < pieceInfoRand->Length(); i++) {
+            v8::Local<v8::Array> pieceInfoRandI = v8::Local<v8::Array>::Cast(pieceInfoRand->Get(i));
+            for (unsigned int j = 0; j < pieceInfoRandI->Length(); j++) {
+              v8::Local<v8::String> res = Nan::To<v8::String>(pieceInfoRandI->Get(j)).ToLocalChecked();
+              Nan::Utf8String hash(res);
+              std::string _hash = *hash;
+              obj->game.get_board()->PIECE_INFO_RAND[i][j] = std::stoull(_hash);
+            }
+          }
+        }
+
+        v8::Local<v8::String> handInfoRandStr = Nan::New<v8::String>("handInfoRand").ToLocalChecked();
+        if ( Nan::Has(tpt, handInfoRandStr).FromJust() ) {
+          v8::Local<v8::Array> handInfoRand = v8::Local<v8::Array>::Cast(
+            Nan::Get(tpt, handInfoRandStr).ToLocalChecked()
+          );
+          for (unsigned int i = 0; i < handInfoRand->Length(); i++) {
+            v8::Local<v8::Array> handInfoRandI = v8::Local<v8::Array>::Cast(handInfoRand->Get(i));
+            for (unsigned int j = 0; j < handInfoRandI->Length(); j++) {
+              v8::Local<v8::Array> handInfoRandIJ = v8::Local<v8::Array>::Cast(handInfoRandI->Get(j));
+              for (unsigned int k = 0; k < handInfoRandIJ->Length(); k++){
+                v8::Local<v8::String> res = Nan::To<v8::String>(handInfoRandIJ->Get(k)).ToLocalChecked();
+                Nan::Utf8String hash(res);
+                std::string _hash = *hash;
+                obj->game.get_board()->HAND_INFO_RAND[i][j][k] = std::stoull(_hash);
+              }
+            }
+          }
+        }
+
+        v8::Local<v8::String> turnRandStr = Nan::New<v8::String>("turnRand").ToLocalChecked();
+        if ( Nan::Has(tpt, turnRandStr).FromJust() ) {
+          v8::Local<v8::Array> turnRand = v8::Local<v8::Array>::Cast(
+            Nan::Get(tpt, turnRandStr).ToLocalChecked()
+          );
+          for (unsigned int i = 0; i < turnRand->Length(); i++) {
+            v8::Local<v8::String> res = Nan::To<v8::String>(turnRand->Get(i)).ToLocalChecked();
+            Nan::Utf8String hash(res);
+            std::string _hash = *hash;
+            obj->game.get_board()->TURN_RAND[i] = std::stoull(_hash);
+          }
+        }
+      }
+
     }
-    obj->game.game_initialize();
+
     info.GetReturnValue().SetNull();
   }
 
@@ -260,6 +319,80 @@ class Komachan : public Nan::ObjectWrap {
     Komachan* obj = ObjectWrap::Unwrap<Komachan>(info.This());
     obj->game.game_finalize();
     info.GetReturnValue().SetNull();
+  }
+
+  static NAN_METHOD(GetTpt) {
+    Komachan* obj = ObjectWrap::Unwrap<Komachan>(info.This());
+    //obj->game.get_board()->print_tpt();
+    auto game_tpt = obj->game.get_board()->tpt;
+    auto itr = game_tpt.begin();
+    v8::Local<v8::Array> tpt = Nan::New<v8::Array>();
+    int idx = 0;
+    while ( itr != game_tpt.end() ) {
+      unsigned long long hash = (*itr).first;
+      std::string hash_str = std::to_string(hash);
+      tpt_v tpt_evals = (*itr).second;
+      v8::Local<v8::Object> tptValue = Nan::New<v8::Object>();
+      v8::Local<v8::Object> evals = Nan::New<v8::Object>();
+
+      Nan::Set(tptValue, Nan::New<v8::String>("hash").ToLocalChecked(), Nan::New<v8::String>(hash_str).ToLocalChecked());
+
+      Nan::Set(evals, Nan::New<v8::String>("depth").ToLocalChecked(), Nan::New<v8::Number>(tpt_evals.depth));
+      Nan::Set(evals, Nan::New<v8::String>("eval").ToLocalChecked(), Nan::New<v8::Number>(tpt_evals.eval));
+
+      Nan::Set(tptValue, Nan::New<v8::String>("evals").ToLocalChecked(), evals);
+
+      Nan::Set(tpt, Nan::New<v8::Number>(idx), tptValue);
+      idx++;
+      itr++;
+    }
+    info.GetReturnValue().Set(tpt);
+  }
+
+  static NAN_METHOD(GetZobrist) {
+    Komachan* obj = ObjectWrap::Unwrap<Komachan>(info.This());
+    v8::Local<v8::Object> hash = Nan::New<v8::Object>();
+    v8::Local<v8::Object> pieceInfoRand = Nan::New<v8::Array>();
+    v8::Local<v8::Object> handInfoRand = Nan::New<v8::Array>();
+    v8::Local<v8::Object> turnRand = Nan::New<v8::Array>();
+
+    for(int i = 0; i < 32; i++) {
+      v8::Local<v8::Array> pieceInfoRandJ = Nan::New<v8::Array>();
+      for(int j = 0; j < 32; j++) {
+        v8::Local<v8::String> hash = Nan::New<v8::String>(
+          std::to_string(obj->game.get_board()->PIECE_INFO_RAND[i][j])
+        ).ToLocalChecked();
+        Nan::Set(pieceInfoRandJ, Nan::New<v8::Number>(j), hash);
+      }
+      Nan::Set(pieceInfoRand, Nan::New<v8::Number>(i), pieceInfoRandJ);
+    }
+    Nan::Set(hash, Nan::New<v8::String>("pieceInfoRand").ToLocalChecked(), pieceInfoRand);
+
+    for(int i = 0; i < 2; i++) {
+      v8::Local<v8::Array> handInfoRandJ = Nan::New<v8::Array>();
+      for(int j = 0; j < 4; j++) {
+        v8::Local<v8::Array> handInfoRandK = Nan::New<v8::Array>();
+        for (int k = 0; k < 8; k++) {
+          v8::Local<v8::String> hash = Nan::New<v8::String>(
+            std::to_string(obj->game.get_board()->HAND_INFO_RAND[i][j][k])
+          ).ToLocalChecked();
+          Nan::Set(handInfoRandK, Nan::New<v8::Number>(k), hash);
+        }
+        Nan::Set(handInfoRandJ, Nan::New<v8::Number>(j), handInfoRandK);
+      }
+      Nan::Set(handInfoRand, Nan::New<v8::Number>(i), handInfoRandJ);
+    }
+    Nan::Set(hash, Nan::New<v8::String>("handInfoRand").ToLocalChecked(), handInfoRand);
+
+    for( int i = 0; i < 2; i++) {
+      v8::Local<v8::String> hash = Nan::New<v8::String>(
+        std::to_string(obj->game.get_board()->TURN_RAND[i])
+      ).ToLocalChecked();
+      Nan::Set(turnRand, Nan::New<v8::Number>(i), hash);
+    }
+    Nan::Set(hash, Nan::New<v8::String>("turnRand").ToLocalChecked(), turnRand);
+
+    info.GetReturnValue().Set(hash);
   }
 
   static NAN_METHOD(Print) {

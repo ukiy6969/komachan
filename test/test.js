@@ -4,10 +4,10 @@ var obj1 = Komachan.newKomachan();
 var obj2 = Komachan.newKomachan();
 
 obj1.start();
-obj2.start();
-obj1.print();
-obj2.print();
-console.log(obj1.legal());
+//obj2.start();
+//obj1.print();
+//obj2.print();
+//console.log(obj1.legal());
 var move1 = obj1.move({
   from: {
     x: 3,
@@ -19,8 +19,9 @@ var move1 = obj1.move({
   },
   piece: 'GI'
 });
-console.log(move1);
+//console.log(move1);
 
+/*
 obj2.move({
   from: {
     x: 3,
@@ -32,10 +33,19 @@ obj2.move({
   },
   piece: 'GI'
 });
-
-obj1.print();
-obj2.print();
+*/
+//obj1.print();
+//obj2.print();
 var move12 = obj1.search();
 console.log(move12);
 obj1.end();
-obj1.print();
+var zobrist = obj1.getZobrist();
+for(var i = 0; i < 2; i++) {
+  for (var j = 0; j < 4; j++) {
+    for (var k = 0; k < 8; k++) {
+      console.log(zobrist.handInfoRand[i][j][k]);
+    }
+  }
+}
+
+//obj1.print();

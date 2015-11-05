@@ -2371,13 +2371,18 @@ int Board::b_hand(int piece){
 void Board::print_tpt(){
   auto itr = TPT.begin();
   while(itr != TPT.end()){
-    std::cout << (*itr).first << ":" << (*itr).second.eval << std::endl;
+    std::cout << (*itr).first << ":" << (*itr).second.eval << ":" <<  (*itr).second.depth<< std::endl;
+    ++itr;
   }
 }
 
 void Board::set_tpt(unsigned long long key, int depth, short eval) {
   tpt_v new_val = { depth, eval};
   tpt[key] = new_val;
+}
+
+std::unordered_map<unsigned long long, tpt_v>* Board::get_tpt() {
+  return &tpt;
 }
 
 void Board::write_tpt(std::string binPath) {

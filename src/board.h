@@ -325,6 +325,7 @@ public:
   void update_zobrist(unsigned long long);
   unsigned long long get_zobrist();
   void set_tpt(unsigned long long key, int depth, short value);
+  std::unordered_map<unsigned long long, tpt_v>* get_tpt();
   void print_tpt();
   void write_tpt(std::string binPath);
   void read_tpt(std::string binPath);
