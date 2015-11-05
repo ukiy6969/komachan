@@ -6,3 +6,4 @@ var zobrist = obj1.getZobrist();
 obj2.start({
   hash : zobrist
 });
+console.log(JSON.stringify(obj2.getZobrist()));
