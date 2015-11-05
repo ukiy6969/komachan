@@ -13,6 +13,7 @@ private:
   Board* board;
 public:
   Search(Board* b);
+  int useTpt;
   int search_root();
   int search(short alpha, short beta, int depth, int ply);
   short evaluate();

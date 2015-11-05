@@ -66,6 +66,15 @@ class Komachan : public Nan::ObjectWrap {
 
   static NAN_METHOD(Start) {
     Komachan* obj = ObjectWrap::Unwrap<Komachan>(info.This());
+    if (info[0]->IsObject() ) {
+      v8::Local<v8::Object> startObj = Nan::To<v8::Object>(info[0]).ToLocalChecked();
+      if (Nan::Has(startObj, Nan::New<v8::String>("useTpt").ToLocalChecked()).FromJust() ) {
+        int useTpt = Nan::To<int32_t>(
+                        Nan::Get(startObj, Nan::New<v8::String>("useTpt").ToLocalChecked()).ToLocalChecked()
+                      ).FromJust();
+        obj->game.get_search()->useTpt = useTpt;
+      }
+    }
     obj->game.game_initialize();
     info.GetReturnValue().SetNull();
   }
