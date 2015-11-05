@@ -55,7 +55,11 @@ int Search::search_root()
     for( imove = 0; imove < nmove; imove++ ) {
 
         board->make_move( legalmoves[ imove ] );
-        value = -search( -beta, -max, d -1, 1 );
+        if (board->get_board_show_cnt() >= 4) {
+          value = -SCORE_MAX;
+        } else {
+          value = -search( -beta, -max, d -1, 1 );
+        }
         evals[imove] = value;
         board->unmake_move();
 
@@ -115,6 +119,7 @@ int Search::search( short alpha, short beta, int depth, int ply )
       if (board->get_board_show_cnt() >= 4) {
         value = -SCORE_MAX;
       }else
+      /*
       if (board->tpt.count(board->game.zobrist) != 0 && board->tpt[board->game.zobrist].depth >= depth) {
         //value = board->get_turn() ? -board->tpt[board->game.zobrist].eval : board->tpt[board->game.zobrist].eval;
         value = board->tpt[board->game.zobrist].eval;
@@ -122,7 +127,8 @@ int Search::search( short alpha, short beta, int depth, int ply )
         value = -search( -beta, -max, depth -1, ply + 1 );
         board->set_tpt(board->game.zobrist, depth -1, value);
       }
-      //value = -search( -beta, -max, depth -1, ply + 1 );
+      */
+      value = -search( -beta, -max, depth -1, ply + 1 );
       board->unmake_move();
 
       if( value >= beta )
