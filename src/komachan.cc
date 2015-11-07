@@ -9,10 +9,11 @@ class Komachan : public Nan::ObjectWrap {
  public:
   static NAN_MODULE_INIT(Init) {
     v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(New);
-    tpl->InstanceTemplate()->SetInternalFieldCount(8);
+    tpl->InstanceTemplate()->SetInternalFieldCount(9);
 
     Nan::SetPrototypeMethod(tpl, "start", Start);
     Nan::SetPrototypeMethod(tpl, "move", Move);
+    Nan::SetPrototypeMethod(tpl, "back", Back);
     Nan::SetPrototypeMethod(tpl, "search", Search);
     Nan::SetPrototypeMethod(tpl, "legal", Legal);
     Nan::SetPrototypeMethod(tpl, "getTpt", GetTpt);
@@ -208,6 +209,14 @@ class Komachan : public Nan::ObjectWrap {
               Nan::New<v8::Boolean>(isAttack)
     );
     info.GetReturnValue().Set(move);
+  }
+
+  static NAN_METHOD(Back) {
+    Komachan* obj = ObjectWrap::Unwrap<Komachan>(info.This());
+    if ( obj->game.get_board()->get_nply() > 0 ) {
+      obj->game.get_board()->unmake_move();
+    }
+    info.GetReturnValue().SetUndefined();
   }
 
   static NAN_METHOD(Search) {

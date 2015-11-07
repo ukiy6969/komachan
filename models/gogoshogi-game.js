@@ -24,6 +24,7 @@ var gogoShogiSchema = mongoose.Schema({
       promote: { type: Boolean },
       capture: { type: String },
       isAttack: { type: Boolean },
+      searchTime: { type: Number }
     }
   ],
   conclude: {
