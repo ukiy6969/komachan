@@ -48,6 +48,7 @@ void Game::game_finalize(){
   if ( _search->useTpt ) {
     _board->write_tpt(binPath);
   }
+  std::cout << "searchALL: " << _search->searchSumTime << std::endl;
 }
 
 unsigned int Game::move(double *_fromX, double *_fromY, double *_toX, double *_toY, const char *_piece, double *_color, double *_promote, std::string* _cap, double *_isAttack){
