@@ -15,7 +15,7 @@
       'conditions': [
         [ 'OS=="mac"', {
           'xcode_settings': {
-            'OTHER_CPLUSPLUSFLAGS' : ['-stdlib=libc++', '-O4'],
+            'OTHER_CPLUSPLUSFLAGS' : ['-stdlib=libc++', '-O3'],
             'MACOSX_DEPLOYMENT_TARGET': '10.7',
             },
           }

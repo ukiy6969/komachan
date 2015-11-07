@@ -76,11 +76,11 @@ double Search::search_root()
 
     }
 
-    if (d != depth) {
+    if (d < (depth - 2)) {
       move_ordering(evals, legalmoves, nmove);
     }
 
-    if ( ((double)(clock() - start) / CLOCKS_PER_SEC) > maxtime) {
+    if ( ((double)(clock() - start) / CLOCKS_PER_SEC) > (double)maxtime) {
       break;
     }
 
@@ -97,7 +97,7 @@ double Search::search_root()
   return search_time;
 }
 
-int Search::search( short alpha, short beta, int depth, int ply )
+inline int Search::search( short alpha, short beta, int depth, int ply )
 {
   int imove;
   short value;
@@ -148,7 +148,7 @@ int Search::search( short alpha, short beta, int depth, int ply )
   return max;
 }
 
-short Search::evaluate()
+inline short Search::evaluate()
 {
   int score = 0;
 
@@ -168,7 +168,7 @@ short Search::evaluate()
   score += ( board->w_hand( bishop ) - board->b_hand( bishop ) ) * 340;
   score += ( board->w_hand( rook )   - board->b_hand( rook ) )   * 390;
 
-  return board->get_turn() ? -score: score;
+  return board->game.turn ? -score: score;
 }
 
 

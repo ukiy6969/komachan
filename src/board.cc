@@ -1767,7 +1767,7 @@ inline int Board::gen_nocap_b( unsigned int moves[], int count, unsigned int pin
 }
 
 
-void Board::make_move_w( unsigned int move )
+void Board::make_move_w( const unsigned int& move )
 {
   const int from    = MOVE_FROM( move );
   const int to      = MOVE_TO( move );
@@ -1871,7 +1871,7 @@ void Board::make_move_w( unsigned int move )
   return;
 }
 
-void Board::make_move_b( unsigned int move )
+void Board::make_move_b( const unsigned int& move )
 {
   const int from    = MOVE_FROM( move );
   const int to      = MOVE_TO( move );
@@ -2357,7 +2357,7 @@ void Board::unmake_move(){
   TURN ? unmake_move_w() : unmake_move_b();
 }
 
-void Board::make_move(int move){
+void Board::make_move(const int& move){
   TURN ? make_move_b( move ) : make_move_w( move );
 }
 
