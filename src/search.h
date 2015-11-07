@@ -17,7 +17,8 @@ public:
   int searchDepth;
   double searchMaxTime;
   double searchSumTime;
+  double currentEval;
   double search_root();
-  int search(short alpha, short beta, int depth, int ply);
-  short evaluate();
+  inline int search(short alpha, short beta, int depth, int ply);
+  inline short evaluate();
 };

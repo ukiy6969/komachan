@@ -6,6 +6,7 @@ Search::Search(Board* b){
   searchDepth = SEARCH_DEPTH;
   searchMaxTime = SEARCH_MAX_TIME;
   searchSumTime = 0;
+  currentEval = 0;
 }
 
 inline void move_ordering(short *evals, unsigned int *legal_moves, unsigned int n);
@@ -92,6 +93,7 @@ double Search::search_root()
   searchSumTime += search_time;
 
   board->make_move( legalmoves[ best ] );
+  currentEval = max;
   return search_time;
 }
 

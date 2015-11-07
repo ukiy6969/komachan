@@ -236,7 +236,7 @@ void Io::out_position()
   }
   out("\n");
   out_board();
-  out(" Root position evaluation = %d\n", search->evaluate() );
+  out(" Root position evaluation = %d\n", search->currentEval );
 
   unsigned int moves[256];
   int nmove;
@@ -477,7 +477,7 @@ void Io::out_board(){
   out("\ncal_zobrist_hash=%llu\n", board->game.zobrist );
   out("get_zobrist_hash=%llu\n", board->get_zobrist() );
   out("show_board_cnt=%d\n", board->get_board_show_cnt() );
-  out("search_sum_time=%f\n", game->get_search()->searchSumTime);
+  out("search_sum_time=%f\n", game->get_search()->currentEval );
   //print_tpt();
   out("\n\n");
 
