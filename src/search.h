@@ -11,7 +11,7 @@ private:
   Board* board;
 public:
   Search(Board* b);
-  static constexpr int SEARCH_DEPTH = 6;
+  static constexpr int SEARCH_DEPTH = 8;
   static constexpr double SEARCH_MAX_TIME = 20.0;
   int useTpt;
   int searchDepth;
