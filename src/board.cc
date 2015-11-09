@@ -2377,7 +2377,7 @@ void Board::print_tpt(){
 }
 
 void Board::set_tpt(unsigned long long key, int depth, short eval) {
-  tpt_v new_val = { depth, eval};
+  tpt_v new_val = { depth, (short)abs((int)eval)};
   tpt[key] = new_val;
 }
 

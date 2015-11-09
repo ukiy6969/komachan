@@ -138,6 +138,8 @@ class Komachan : public Nan::ObjectWrap {
             obj->game.get_board()->TURN_RAND[i] = std::stoull(_hash);
           }
         }
+
+        obj->game.get_board()->zobrist_check();
       }
 
     }

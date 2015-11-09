@@ -21,4 +21,5 @@ public:
   double search_root();
   int search(short alpha, short beta, int depth, int ply);
   short evaluate();
+  void set_tpt(unsigned long long hash, int depth, short eval);
 };

@@ -62,6 +62,13 @@ double Search::search_root()
         board->make_move( legalmoves[ imove ] );
         if (board->get_board_show_cnt() >= 4) {
           value = -SCORE_MAX;
+        } else if (useTpt) {
+          if (board->tpt.count(board->game.zobrist) != 0 && board->tpt[board->game.zobrist].depth >= d - 1) {
+            value = board->game.turn ? -board->tpt[board->game.zobrist].eval : board->tpt[board->game.zobrist].eval;
+          } else {
+            value = -search( -beta, -max, d -1, 1 );
+            set_tpt(board->game.zobrist, d -1, value);
+          }
         } else {
           value = -search( -beta, -max, d -1, 1 );
         }
@@ -99,10 +106,10 @@ double Search::search_root()
 
 inline int Search::search( short alpha, short beta, int depth, int ply )
 {
-  int imove;
-  short value;
+  int imove = 0;
+  short value = 0;
   short max = -SCORE_MAX;
-  int nmove;
+  int nmove = 0;
 
   unsigned int legalmoves[ SIZE_LEGALMOVES ];
 
@@ -123,11 +130,11 @@ inline int Search::search( short alpha, short beta, int depth, int ply )
       if (board->get_board_show_cnt() >= 4) {
         value = -SCORE_MAX;
       }else if (useTpt) {
-        if (board->tpt.count(board->game.zobrist) != 0 && board->tpt[board->game.zobrist].depth >= depth) {
-          value = board->tpt[board->game.zobrist].eval;
+        if (board->tpt.count(board->game.zobrist) != 0 && board->tpt[board->game.zobrist].depth >= depth - 1) {
+          value = board->game.turn ? -board->tpt[board->game.zobrist].eval : board->tpt[board->game.zobrist].eval;
         } else {
           value = -search( -beta, -max, depth -1, ply + 1 );
-          board->set_tpt(board->game.zobrist, depth -1, value);
+          set_tpt(board->game.zobrist, depth -1, value);
         }
       }else {
         value = -search( -beta, -max, depth -1, ply + 1 );
@@ -190,4 +197,9 @@ inline void move_ordering(short *evals, unsigned int *legal_moves, unsigned int 
       legal_moves[j] = tmp_l;
     }
   }
+}
+
+inline void Search::set_tpt(unsigned long long hash, int depth, short eval) {
+  tpt_v new_val = { depth, (short)abs((int)eval)};
+  board->tpt[hash] = new_val;
 }
