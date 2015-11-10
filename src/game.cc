@@ -180,7 +180,7 @@ double Game::search(double *_fromX, double *_fromY, double *_toX, double *_toY, 
     *_isAttack = 0;
   }
 
-  *_color = _board->turn();
+  *_color = 1 - _board->turn();
   return search_time;
 }
 
