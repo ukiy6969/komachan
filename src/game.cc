@@ -39,16 +39,16 @@ void Game::game_initialize(){
     std::cout << "zobrist is duplicate" << std::endl;
     exit(1);
   }
-  if ( _search->useTpt) {
-    _board->read_tpt(binPath);
-  }
+}
+
+void Game::read_tpt() {
+  _search->read_tpt(binPath);
 }
 
 void Game::game_finalize(){
   if ( _search->useTpt ) {
-    _board->write_tpt(binPath);
+    _search->write_tpt(binPath);
   }
-  std::cout << "searchALL: " << _search->searchSumTime << std::endl;
 }
 
 unsigned int Game::move(double *_fromX, double *_fromY, double *_toX, double *_toY, const char *_piece, double *_color, double *_promote, std::string* _cap, double *_isAttack){

@@ -485,8 +485,8 @@ void Io::out_board(){
 }
 
 void Io::print_tpt() {
-  auto itr = board->tpt.begin();
-  while(itr != board->tpt.end()){
+  auto itr = search->tpt.begin();
+  while(itr != search->tpt.end()){
     out("zobrist_has=%llu eval=%d\n", (*itr).first, (*itr).second.eval);
     ++itr;
   }

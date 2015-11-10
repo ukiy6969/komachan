@@ -2368,55 +2368,6 @@ int Board::b_hand(int piece){
     return (int)((B_HAND_A >> ((piece)*2)) & b0011);
 }
 
-void Board::print_tpt(){
-  auto itr = TPT.begin();
-  while(itr != TPT.end()){
-    std::cout << (*itr).first << ":" << (*itr).second.eval << ":" <<  (*itr).second.depth<< std::endl;
-    ++itr;
-  }
-}
-
-void Board::set_tpt(unsigned long long key, int depth, short eval) {
-  tpt_v new_val = { depth, (short)abs((int)eval)};
-  tpt[key] = new_val;
-}
-
-std::unordered_map<unsigned long long, tpt_v>* Board::get_tpt() {
-  return &tpt;
-}
-
-void Board::write_tpt(std::string binPath) {
-  std::string tpt_bin_name = "/Tpt.bin";
-  std::string bp(binPath);
-  bp.append(tpt_bin_name);
-  std::ofstream ofs(bp.c_str(), std::ios_base::out | std::ios_base::binary);
-  if (ofs) {
-    auto itr = TPT.begin();
-    while(itr != TPT.end()){
-      ofs.write(reinterpret_cast<const char *>(&(*itr).first), sizeof((*itr).first));
-      ofs.write(reinterpret_cast<const char *>(&(*itr).second), sizeof((*itr).second));
-      ++itr;
-    }
-  }
-  ofs.close();
-}
-
-void Board::read_tpt(std::string binPath) {
-  std::string tpt_bin_name = "/Tpt.bin";
-  std::string bp(binPath);
-  bp.append(tpt_bin_name);
-  std::ifstream ifs(bp.c_str() ,std::ios_base::in | std::ios_base::binary);
-  if (ifs) {
-    std::pair<unsigned long long, tpt_v> tptv;
-    while(!ifs.eof()){
-      ifs.read(reinterpret_cast<char *>(&(tptv.first)), sizeof(tptv.first));
-      ifs.read(reinterpret_cast<char *>(&(tptv.second)), sizeof(tptv.second));
-      TPT.insert(tptv);
-    }
-  }
-  ifs.close();
-}
-
 int Board::get_board_show_cnt() {
   if (N_PLY <= 0) { return 0; }
   unsigned long long check = history[N_PLY].zobrist;

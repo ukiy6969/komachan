@@ -252,8 +252,6 @@ public:
   tree_t game;
   hist_t history[ RECORD_SIZE ];
 
-  // トランスポジションテーブル
-  std::unordered_map<unsigned long long, tpt_v> tpt;
   static const int Attack_Rook_shift[];
   static const int Attack_Bishop_shift[];
 
@@ -324,10 +322,5 @@ public:
   void printZobristHashed();
   void update_zobrist(unsigned long long);
   unsigned long long get_zobrist();
-  void set_tpt(unsigned long long key, int depth, short value);
-  std::unordered_map<unsigned long long, tpt_v>* get_tpt();
-  void print_tpt();
-  void write_tpt(std::string binPath);
-  void read_tpt(std::string binPath);
   int get_board_show_cnt();
 };

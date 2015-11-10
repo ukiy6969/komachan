@@ -12,6 +12,7 @@ public:
   Board* get_board();
   Search* get_search();
   void game_initialize();
+  void read_tpt();
   void game_finalize();
   unsigned int move(double *_fromX, double *_fromY, double *_toX, double *_toY, const char *piece, double *_color, double *_promote, std::string* cap, double *isAttack);
   double search(double *_fromX, double *_fromY, double *_toX, double *_toY, std::string *piece, double *_color, double *_promote, std::string* cap, double *isAttack);

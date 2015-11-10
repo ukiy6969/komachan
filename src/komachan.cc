@@ -76,6 +76,7 @@ class Komachan : public Nan::ObjectWrap {
       if (Nan::Has(startObj, useTptStr).FromJust() ) {
         int useTpt = Nan::To<int32_t>(Nan::Get(startObj, useTptStr).ToLocalChecked()).FromJust();
         obj->game.get_search()->useTpt = useTpt;
+        obj->game.read_tpt();
       }
       v8::Local<v8::String> searchDepthStr = Nan::New<v8::String>("searchDepth").ToLocalChecked();
       if (Nan::Has(startObj, searchDepthStr).FromJust() ) {
@@ -235,6 +236,11 @@ class Komachan : public Nan::ObjectWrap {
     v8::Local<v8::Object> to = Nan::New<v8::Object>();
 
     Nan::Set(
+      move,
+      Nan::New<v8::String>("color").ToLocalChecked(),
+      Nan::New<v8::Number>(color)
+    );
+    Nan::Set(
       from,
       Nan::New<v8::String>("x").ToLocalChecked(),
       Nan::New<v8::Number>(fromX)
@@ -335,7 +341,7 @@ class Komachan : public Nan::ObjectWrap {
   static NAN_METHOD(GetTpt) {
     Komachan* obj = ObjectWrap::Unwrap<Komachan>(info.This());
     //obj->game.get_board()->print_tpt();
-    auto game_tpt = obj->game.get_board()->tpt;
+    auto game_tpt = obj->game.get_search()->tpt;
     auto itr = game_tpt.begin();
     v8::Local<v8::Array> tpt = Nan::New<v8::Array>();
     int idx = 0;
