@@ -36,16 +36,17 @@ double Search::search_root()
   int best;
   unsigned int nmove = 0, imove;
   int depth = searchDepth;
+  int depthed = 0;
   int d;
   double maxtime = searchMaxTime;
   double search_time;
   short value;
   short beta, max = 0;
-  unsigned int legalmoves[ SIZE_LEGALMOVES ];
+  //unsigned int legalmoves[ SIZE_LEGALMOVES ];
   short evals[ SIZE_LEGALMOVES ];
   clock_t start, end;
 
-  nmove = board->gen_legalmoves( legalmoves );
+  nmove = board->gen_legalmoves( legal_moves[0] );
 
   if( nmove == 0 )
     {
@@ -68,25 +69,28 @@ double Search::search_root()
   start = clock();
 
   for(d = 2; d <= depth; d++  ){
-    std::cout << "depth: " << d << std::endl;
+    //std::cout << "depth: " << d << std::endl;
 
     best = 0;
     max   = -SCORE_MAX;
     beta  = SCORE_MAX;
     for( imove = 0; imove < nmove; imove++ ) {
 
-        board->make_move( legalmoves[ imove ] );
+        board->make_move( legal_moves[ 0 ][ imove ] );
         if (board->get_board_show_cnt() >= 4) {
           value = -SCORE_MAX;
         } else if (useTpt) {
           if (tpt.count(board->game.zobrist) != 0 && tpt[board->game.zobrist].depth >= d - 1) {
-            value = board->game.turn ? -tpt[board->game.zobrist].eval : tpt[board->game.zobrist].eval;
+            value = tpt[board->game.zobrist].eval;
           } else {
-            value = -search( -beta, -max, d -1, 1 );
-            set_tpt(board->game.zobrist, d -1, value);
+            depthed = 0;
+            value = -search( -beta, -max, d -1, 1, &depthed );
+            set_tpt(board->game.zobrist, d-1, value);
           }
         } else {
-          value = -search( -beta, -max, d -1, 1 );
+          depthed = 0;
+          value = -search( -beta, -max, d -1, 1, &depthed);
+          //std::cout << "search root depth" << depthed << std::endl;
         }
         evals[imove] = value;
         board->unmake_move();
@@ -100,7 +104,7 @@ double Search::search_root()
     }
 
     if (d < (depth - 2)) {
-      move_ordering(evals, legalmoves, nmove);
+      move_ordering(evals, legal_moves[ 0 ], nmove);
     }
 
     if ( ((double)(clock() - start) / CLOCKS_PER_SEC) > (double)maxtime) {
@@ -116,17 +120,22 @@ double Search::search_root()
   search_time = (double)(end - start) / CLOCKS_PER_SEC;
   searchSumTime += search_time;
 
-  board->make_move( legalmoves[ best ] );
+  board->make_move( legal_moves[ 0 ][ best ] );
   currentEval = max;
   return search_time;
 }
 
-inline int Search::search( short alpha, short beta, int depth, int ply)
+inline int Search::search( short alpha, short beta, int depth, int ply, int* _depthed)
 {
-  int imove = 0;
-  short value = 0;
-  short max = -SCORE_MAX;
-  int nmove = 0;
+  const int cdepth = 1 + (*_depthed);
+  imove[ cdepth] = 0;
+  value[ cdepth] = 0;
+  max[ cdepth] = -SCORE_MAX;
+  nmove[ cdepth] = 0;
+  isConti[ cdepth] = 0;
+  depthed[ cdepth] = cdepth;
+  maxDepth[ cdepth] = cdepth;
+  //std::cout << "depthed" << depthed << std::endl;
 
 
   if( depth <= 0 )
@@ -134,42 +143,57 @@ inline int Search::search( short alpha, short beta, int depth, int ply)
       return evaluate();
     }
 
-  unsigned int legalmoves[ SIZE_LEGALMOVES ];
-  nmove = board->gen_legalmoves( legalmoves );
+  //unsigned int legalmoves[ SIZE_LEGALMOVES ];
+  nmove[cdepth] = board->gen_legalmoves( legal_moves[ cdepth ] );
 
-  if( nmove == 0 )
-    { return SCORE_MATED + ply; }
+  if( nmove[cdepth] == 0 ) {
+    return SCORE_MATED + ply;
+  }
 
-  max = alpha;
-  for( imove = 0; imove < nmove; imove++ )
+  max[cdepth] = alpha;
+  for( imove[cdepth] = 0; imove[cdepth] < nmove[cdepth]; imove[cdepth]++ )
     {
-      board->make_move( legalmoves[ imove ] );
+      board->make_move( legal_moves[ cdepth ][ imove[cdepth] ] );
       if (board->get_board_show_cnt() >= 4) {
-        value = -SCORE_MAX;
+        value[cdepth] = -SCORE_MAX;
       }else if (useTpt) {
         if (tpt.count(board->game.zobrist) != 0 && tpt[board->game.zobrist].depth >= depth - 1) {
-          value = board->game.turn ? -tpt[board->game.zobrist].eval : tpt[board->game.zobrist].eval;
+          value[cdepth] = tpt[board->game.zobrist].eval;
         } else {
-          value = -search( -beta, -max, depth -1, ply + 1 );
-          set_tpt(board->game.zobrist, depth -1, value);
+          depthed[cdepth] = cdepth;
+          if ( (depth-1) == 0 && MOVE_CAPTURE( legal_moves[ cdepth ][ imove[ cdepth ] ]) ) {
+            value[ cdepth ] = -search( -beta, -max[ cdepth ], depth, ply + 1, &depthed[ cdepth ] );
+          } else {
+            value[cdepth] = -search( -beta, -max[cdepth], depth -1, ply + 1, &depthed[cdepth] );
+          }
+          set_tpt(board->game.zobrist, depth -1, value[cdepth]);
         }
       }else {
-        value = -search( -beta, -max, depth -1, ply + 1 );
+        depthed[cdepth] = cdepth;
+        if ( (depth-1) == 0 && MOVE_CAPTURE( legal_moves[ cdepth ][ imove[ cdepth ] ]) ) {
+          value[ cdepth ] = -search( -beta, -max[ cdepth ], depth, ply + 1, &depthed[ cdepth ] );
+        } else {
+          value[cdepth] = -search( -beta, -max[cdepth], depth -1, ply + 1, &depthed[cdepth] );
+        }
       }
       board->unmake_move();
 
-      if( value >= beta )
+      if( value[cdepth] >= beta )
         {
-          return value;
+          *_depthed = depthed[cdepth];
+          return value[cdepth];
         }
-      if( value > max )
+      if( value[cdepth] > max[cdepth] )
         {
-          max = value;
+          max[cdepth] = value[cdepth];
+          maxDepth[cdepth] = depthed[cdepth];
         }
 
     }
 
-  return max;
+  *_depthed = maxDepth[cdepth];
+
+  return max[cdepth];
 }
 
 inline short Search::evaluate()
@@ -216,8 +240,15 @@ inline void move_ordering(short *evals, unsigned int *legal_moves, unsigned int 
   }
 }
 
+inline int Search::is_conti_search() {
+  if (MOVE_CAPTURE(board->history[board->game.n_ply].move)){
+    return 1;
+  }
+  return 0;
+}
+
 inline void Search::set_tpt(unsigned long long hash, int depth, short eval) {
-  if ( tpt.size() < TPT_SIZE_MAX && depth > 5) {
+  if ( tpt.size() < TPT_SIZE_MAX && depth > 1) {
     tpt_v new_val = { depth, eval};
     tpt[hash] = new_val;
     //std::cout << "tpt_size: " << tpt.size() << std::endl;

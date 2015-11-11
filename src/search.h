@@ -8,7 +8,15 @@ class Search {
 private:
   static const int SCORE_MAX = 8100;
   static const int SCORE_MATED = (-SCORE_MAX);
-  static constexpr int TPT_SIZE_MAX = 100000;
+  static constexpr int TPT_SIZE_MAX = 10000000;
+  unsigned int legal_moves[25][ SIZE_LEGALMOVES ];
+  int imove[25];
+  short value[25];
+  short max[25];
+  int nmove[25];
+  int depthed[25];
+  int maxDepth[25];
+  int isConti[25];
   Board* board;
 public:
   Search(Board* b);
@@ -39,8 +47,9 @@ public:
   short handBishopScore;
   short handRookScore;
   double search_root();
-  int search(short alpha, short beta, int depth, int ply);
+  int search(short alpha, short beta, int depth, int ply, int *_depthed);
   short evaluate();
+  int is_conti_search();
   void set_tpt(unsigned long long key, int depth, short value);
   std::unordered_map<unsigned long long, tpt_v>* get_tpt();
   void print_tpt();
