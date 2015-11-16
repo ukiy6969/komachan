@@ -306,7 +306,7 @@ int Board::gen_legalmoves( unsigned int moves[] )
   return nmove;
 }
 
-int Board::gen_evasion_w( unsigned int moves[], int count, int nAttacks,
+inline int Board::gen_evasion_w( unsigned int moves[], int count, int nAttacks,
                    unsigned int attack_pieces, unsigned int pin[]  )
 {
   unsigned int dests, att;
@@ -426,7 +426,7 @@ int Board::gen_evasion_w( unsigned int moves[], int count, int nAttacks,
   return count;
 }
 
-int Board::gen_evasion_b( unsigned int moves[], int count, int nAttacks,
+inline int Board::gen_evasion_b( unsigned int moves[], int count, int nAttacks,
                    unsigned int attack_pieces, unsigned int pin[] )
 {
   unsigned int dests, att;
@@ -546,7 +546,7 @@ int Board::gen_evasion_b( unsigned int moves[], int count, int nAttacks,
   return count;
 }
 
-int Board::mate_by_dropping_pawn_w( int sq )
+inline int Board::mate_by_dropping_pawn_w( int sq )
 {
  /* ret = 1: illegal
         = 0: legal   */
@@ -579,7 +579,7 @@ int Board::mate_by_dropping_pawn_w( int sq )
   return 1;
 }
 
-int Board::mate_by_dropping_pawn_b( int sq )
+inline int Board::mate_by_dropping_pawn_b( int sq )
 {
  /* ret = 1: illegal
         = 0: legal   */
@@ -622,7 +622,7 @@ int Board::mate_by_dropping_pawn_b( int sq )
       count ++; } \
     dests ^= Bit( from ); }
 
-int Board::gen_attacks_to_w( unsigned int moves[], int count, int sq, int cap, unsigned int pin[] )
+inline int Board::gen_attacks_to_w( unsigned int moves[], int count, int sq, int cap, unsigned int pin[] )
 {
   /* King is not considered. */
   unsigned int dests;
@@ -708,7 +708,7 @@ int Board::gen_attacks_to_w( unsigned int moves[], int count, int sq, int cap, u
       count ++; } \
     dests ^= Bit( from ); }
 
-int Board::gen_attacks_to_b( unsigned int moves[], int count, int sq, int cap, unsigned int pin[] )
+inline int Board::gen_attacks_to_b( unsigned int moves[], int count, int sq, int cap, unsigned int pin[] )
 {
   /* King is not considered. */
   unsigned int dests;
@@ -848,7 +848,7 @@ int Board::attacks_to_b( int sq, unsigned int *attack_pieces )
 }
 
 
-void Board::pinInfo_w( unsigned int pin[] ){
+inline void Board::pinInfo_w( unsigned int pin[] ){
   memset( pin, 0, sizeof(unsigned int)*32 );
 
   unsigned bb;
@@ -880,7 +880,7 @@ void Board::pinInfo_w( unsigned int pin[] ){
   return;
 }
 
-void Board::pinInfo_b( unsigned int pin[] ){
+inline void Board::pinInfo_b( unsigned int pin[] ){
   memset( pin, 0, sizeof(unsigned int)*32 );
 
   unsigned bb;
@@ -913,7 +913,7 @@ void Board::pinInfo_b( unsigned int pin[] ){
 }
 
 
-int Board::gen_drop_w( unsigned int moves[], int count )
+inline int Board::gen_drop_w( unsigned int moves[], int count )
 {
   unsigned long dests;
   int to;
@@ -986,7 +986,7 @@ int Board::gen_drop_w( unsigned int moves[], int count )
   return count;
 }
 
-int Board::gen_drop_b( unsigned int moves[], int count )
+inline int Board::gen_drop_b( unsigned int moves[], int count )
 {
   unsigned long dests;
   int to;
@@ -1060,7 +1060,7 @@ int Board::gen_drop_b( unsigned int moves[], int count )
   return count;
 }
 
-int Board::gen_cap_w( unsigned int moves[], int count, unsigned int pin[] )
+inline int Board::gen_cap_w( unsigned int moves[], int count, unsigned int pin[] )
 {
   /* ret: number of total moves */
   unsigned int dests, bb, att;
@@ -1237,7 +1237,7 @@ int Board::gen_cap_w( unsigned int moves[], int count, unsigned int pin[] )
 }
 
 
-int Board::gen_cap_b( unsigned int moves[], int count, unsigned int pin[] )
+inline int Board::gen_cap_b( unsigned int moves[], int count, unsigned int pin[] )
 {
   /* ret: number of total moves */
   unsigned int dests, bb, att;
@@ -1414,7 +1414,7 @@ int Board::gen_cap_b( unsigned int moves[], int count, unsigned int pin[] )
 }
 
 
-int Board::gen_nocap_w( unsigned int moves[], int count, unsigned int pin[] )
+inline int Board::gen_nocap_w( unsigned int moves[], int count, unsigned int pin[] )
 {
   /* ret: number of generated moves */
   unsigned int dests, bb, att;
@@ -1590,7 +1590,7 @@ int Board::gen_nocap_w( unsigned int moves[], int count, unsigned int pin[] )
   return count;
 }
 
-int Board::gen_nocap_b( unsigned int moves[], int count, unsigned int pin[]  )
+inline int Board::gen_nocap_b( unsigned int moves[], int count, unsigned int pin[]  )
 {
   /* ret: number of generated moves */
   unsigned int dests, bb, att;
@@ -1767,7 +1767,7 @@ int Board::gen_nocap_b( unsigned int moves[], int count, unsigned int pin[]  )
 }
 
 
-void Board::make_move_w( unsigned int move )
+void Board::make_move_w( const unsigned int& move )
 {
   const int from    = MOVE_FROM( move );
   const int to      = MOVE_TO( move );
@@ -1871,7 +1871,7 @@ void Board::make_move_w( unsigned int move )
   return;
 }
 
-void Board::make_move_b( unsigned int move )
+void Board::make_move_b( const unsigned int& move )
 {
   const int from    = MOVE_FROM( move );
   const int to      = MOVE_TO( move );
@@ -2146,7 +2146,7 @@ void Board::unmake_move_b()
 }
 
 
-int Board::FirstOne( int bb )
+inline int Board::FirstOne( int bb )
 {
   return bb ? __builtin_ctz( bb ) : -1;
 }
@@ -2289,7 +2289,7 @@ void Board::clear_game()
   return;
 }
 
-void Board::calc_occupied_sq()
+inline void Board::calc_occupied_sq()
 {
   int i,index, tmp;
 
@@ -2357,7 +2357,7 @@ void Board::unmake_move(){
   TURN ? unmake_move_w() : unmake_move_b();
 }
 
-void Board::make_move(int move){
+void Board::make_move(const int& move){
   TURN ? make_move_b( move ) : make_move_w( move );
 }
 
@@ -2366,51 +2366,6 @@ int Board::w_hand(int piece){
 }
 int Board::b_hand(int piece){
     return (int)((B_HAND_A >> ((piece)*2)) & b0011);
-}
-
-void Board::print_tpt(){
-  auto itr = TPT.begin();
-  while(itr != TPT.end()){
-    std::cout << (*itr).first << ":" << (*itr).second.eval << std::endl;
-  }
-}
-
-void Board::set_tpt(unsigned long long key, int depth, short eval) {
-  short set_eval = eval > 0 ? eval : -eval;
-  tpt_v new_val = { depth, eval};
-  tpt[key] = new_val;
-}
-
-void Board::write_tpt(std::string binPath) {
-  std::string tpt_bin_name = "/Tpt.bin";
-  std::string bp(binPath);
-  bp.append(tpt_bin_name);
-  std::ofstream ofs(bp.c_str(), std::ios_base::out | std::ios_base::binary);
-  if (ofs) {
-    auto itr = TPT.begin();
-    while(itr != TPT.end()){
-      ofs.write(reinterpret_cast<const char *>(&(*itr).first), sizeof((*itr).first));
-      ofs.write(reinterpret_cast<const char *>(&(*itr).second), sizeof((*itr).second));
-      ++itr;
-    }
-  }
-  ofs.close();
-}
-
-void Board::read_tpt(std::string binPath) {
-  std::string tpt_bin_name = "/Tpt.bin";
-  std::string bp(binPath);
-  bp.append(tpt_bin_name);
-  std::ifstream ifs(bp.c_str() ,std::ios_base::in | std::ios_base::binary);
-  if (ifs) {
-    std::pair<unsigned long long, tpt_v> tptv;
-    while(!ifs.eof()){
-      ifs.read(reinterpret_cast<char *>(&(tptv.first)), sizeof(tptv.first));
-      ifs.read(reinterpret_cast<char *>(&(tptv.second)), sizeof(tptv.second));
-      TPT.insert(tptv);
-    }
-  }
-  ifs.close();
 }
 
 int Board::get_board_show_cnt() {

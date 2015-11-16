@@ -39,11 +39,16 @@ void Game::game_initialize(){
     std::cout << "zobrist is duplicate" << std::endl;
     exit(1);
   }
-  _board->read_tpt(binPath);
+}
+
+void Game::read_tpt() {
+  _search->read_tpt(binPath);
 }
 
 void Game::game_finalize(){
-  _board->write_tpt(binPath);
+  if ( _search->useTpt ) {
+    _search->write_tpt(binPath);
+  }
 }
 
 unsigned int Game::move(double *_fromX, double *_fromY, double *_toX, double *_toY, const char *_piece, double *_color, double *_promote, std::string* _cap, double *_isAttack){
@@ -127,8 +132,8 @@ unsigned int Game::move(double *_fromX, double *_fromY, double *_toX, double *_t
 
 }
 
-int Game::search(double *_fromX, double *_fromY, double *_toX, double *_toY, std::string *_piece, double *_color, double *_promote, std::string* _capture, double *_isAttack){
-  int time = _search->search_root();
+double Game::search(double *_fromX, double *_fromY, double *_toX, double *_toY, std::string *_piece, double *_color, double *_promote, std::string* _capture, double *_isAttack){
+  double search_time = _search->search_root();
   unsigned int move = _board->history[ _board->get_nply() - 1].move;
   unsigned int attack_pieces;
   int type_c = MOVE_TYPE( move );
@@ -175,8 +180,8 @@ int Game::search(double *_fromX, double *_fromY, double *_toX, double *_toY, std
     *_isAttack = 0;
   }
 
-  *_color = _board->turn();
-  return time;
+  *_color = 1 - _board->turn();
+  return search_time;
 }
 
 void Game::legal(const unsigned int& lmove, double *_fromX, double *_fromY, double *_toX, double *_toY, std::string *_piece) {

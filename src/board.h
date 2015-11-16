@@ -252,8 +252,6 @@ public:
   tree_t game;
   hist_t history[ RECORD_SIZE ];
 
-  // トランスポジションテーブル
-  std::unordered_map<unsigned long long, tpt_v> tpt;
   static const int Attack_Rook_shift[];
   static const int Attack_Bishop_shift[];
 
@@ -273,8 +271,8 @@ public:
   //ゲーム状態の変更
   int starting_initialize(std::string binPath); //利き情報の初期化
   void clear_game(); //盤面・手番・持ち駒を初期状態にリセット
-  void make_move_w( unsigned int move );
-  void make_move_b( unsigned int move );
+  void make_move_w( const unsigned int& move );
+  void make_move_b( const unsigned int& move );
   void unmake_move_w( );
   void unmake_move_b( );
   //指し手生成に関わる関数
@@ -313,7 +311,7 @@ public:
   //N_PLYを返す
   int get_nply();
   char turn();
-  void make_move(int move);
+  void make_move(const int& move);
   void unmake_move();
   int w_hand(int piece);
   int b_hand(int piece);
@@ -324,9 +322,5 @@ public:
   void printZobristHashed();
   void update_zobrist(unsigned long long);
   unsigned long long get_zobrist();
-  void set_tpt(unsigned long long key, int depth, short value);
-  void print_tpt();
-  void write_tpt(std::string binPath);
-  void read_tpt(std::string binPath);
   int get_board_show_cnt();
 };

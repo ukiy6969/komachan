@@ -1,4 +1,8 @@
 {
+  'make_global_settings': [
+    ['CXX','/usr/bin/clang++'],
+    ['LINK','/usr/bin/clang++'],
+  ],
   'targets': [
     {
       'target_name': 'komachan',
@@ -15,14 +19,14 @@
       'conditions': [
         [ 'OS=="mac"', {
           'xcode_settings': {
-            'OTHER_CPLUSPLUSFLAGS' : ['-stdlib=libc++'],
+            'OTHER_CPLUSPLUSFLAGS' : ['-stdlib=libc++', '-O3'],
             'MACOSX_DEPLOYMENT_TARGET': '10.7',
             },
           }
         ],
       ],
       'cflags' : [
-        '-std=c++11'
+        '-std=c++11', '-O3'
       ],
     }
   ]

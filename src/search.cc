@@ -2,11 +2,31 @@
 
 Search::Search(Board* b){
   board = b;
+  useTpt = 0;
+  searchDepth = SEARCH_DEPTH;
+  searchMaxTime = SEARCH_MAX_TIME;
+  searchSumTime = 0;
+  currentEval = 0;
+
+  pawnScore = 100;
+  silverScore = 300;
+  goldScore = 350;
+  bishopScore = 350;
+  rookScore = 400;
+  proPawnScore = 200;
+  proSilverScore = 350;
+  horseScore = 450;
+  dragonScore = 500;
+  handPawnScore = 100;
+  handSilverScore = 280;
+  handGoldScore = 370;
+  handBishopScore = 340;
+  handRookScore = 390;
 }
 
 inline void move_ordering(short *evals, unsigned int *legal_moves, unsigned int n);
 
-int Search::search_root()
+double Search::search_root()
 {
   /*
     ret =  0: succeeded
@@ -15,17 +35,18 @@ int Search::search_root()
    */
   int best;
   unsigned int nmove = 0, imove;
-  int depth = SEARCH_DEPTH;
+  int depth = searchDepth;
+  int depthed = 0;
   int d;
-  int maxtime = SEARCH_MAX_TIME;
-  int search_time;
+  double maxtime = searchMaxTime;
+  double search_time;
   short value;
   short beta, max = 0;
-  unsigned int legalmoves[ SIZE_LEGALMOVES ];
+  //unsigned int legalmoves[ SIZE_LEGALMOVES ];
   short evals[ SIZE_LEGALMOVES ];
   clock_t start, end;
 
-  nmove = board->gen_legalmoves( legalmoves );
+  nmove = board->gen_legalmoves( legal_moves[0] );
 
   if( nmove == 0 )
     {
@@ -48,17 +69,28 @@ int Search::search_root()
   start = clock();
 
   for(d = 2; d <= depth; d++  ){
+    //std::cout << "depth: " << d << std::endl;
 
     best = 0;
     max   = -SCORE_MAX;
     beta  = SCORE_MAX;
     for( imove = 0; imove < nmove; imove++ ) {
 
-        board->make_move( legalmoves[ imove ] );
+        board->make_move( legal_moves[ 0 ][ imove ] );
         if (board->get_board_show_cnt() >= 4) {
           value = -SCORE_MAX;
+        } else if (useTpt) {
+          if (tpt.count(board->game.zobrist) != 0 && tpt[board->game.zobrist].depth >= d - 1) {
+            value = tpt[board->game.zobrist].eval;
+          } else {
+            depthed = 0;
+            value = -search( -beta, -max, d -1, 1, &depthed );
+            set_tpt(board->game.zobrist, d-1, value);
+          }
         } else {
-          value = -search( -beta, -max, d -1, 1 );
+          depthed = 0;
+          value = -search( -beta, -max, d -1, 1, &depthed);
+          //std::cout << "search root depth" << depthed << std::endl;
         }
         evals[imove] = value;
         board->unmake_move();
@@ -71,101 +103,120 @@ int Search::search_root()
 
     }
 
-    if (d != depth) {
-      move_ordering(evals, legalmoves, nmove);
+    if (d < (depth - 2)) {
+      move_ordering(evals, legal_moves[ 0 ], nmove);
     }
 
-    /*
-    if ( (((double)clock() - start)) > maxtime) {
+    if ( ((double)(clock() - start) / CLOCKS_PER_SEC) > (double)maxtime) {
+      std::cout << "time up" << std::endl;
       break;
     }
-    */
 
 
   }
 
   end = clock();
 
-  search_time = (double)(end - start);
-  std::cout << search_time << std::endl;
+  search_time = (double)(end - start) / CLOCKS_PER_SEC;
+  searchSumTime += search_time;
 
-  board->make_move( legalmoves[ best ] );
+  board->make_move( legal_moves[ 0 ][ best ] );
+  currentEval = max;
   return search_time;
 }
 
-int Search::search( short alpha, short beta, int depth, int ply )
+inline int Search::search( short alpha, short beta, int depth, int ply, int* _depthed)
 {
-  int imove;
-  short value, _value;
-  short max = -SCORE_MAX;
-  int nmove;
+  const int cdepth = 1 + (*_depthed);
+  imove[ cdepth] = 0;
+  value[ cdepth] = 0;
+  max[ cdepth] = -SCORE_MAX;
+  nmove[ cdepth] = 0;
+  isConti[ cdepth] = 0;
+  depthed[ cdepth] = cdepth;
+  maxDepth[ cdepth] = cdepth;
+  //std::cout << "depthed" << depthed << std::endl;
 
-  unsigned int legalmoves[ SIZE_LEGALMOVES ];
 
   if( depth <= 0 )
     {
       return evaluate();
     }
 
-  nmove = board->gen_legalmoves( legalmoves );
+  //unsigned int legalmoves[ SIZE_LEGALMOVES ];
+  nmove[cdepth] = board->gen_legalmoves( legal_moves[ cdepth ] );
 
-  if( nmove == 0 )
-    { return SCORE_MATED + ply; }
+  if( nmove[cdepth] == 0 ) {
+    return SCORE_MATED + ply;
+  }
 
-  max = alpha;
-  for( imove = 0; imove < nmove; imove++ )
+  max[cdepth] = alpha;
+  for( imove[cdepth] = 0; imove[cdepth] < nmove[cdepth]; imove[cdepth]++ )
     {
-      board->make_move( legalmoves[ imove ] );
+      board->make_move( legal_moves[ cdepth ][ imove[cdepth] ] );
       if (board->get_board_show_cnt() >= 4) {
-        value = -SCORE_MAX;
-      }else
-      /*
-      if (board->tpt.count(board->game.zobrist) != 0 && board->tpt[board->game.zobrist].depth >= depth) {
-        //value = board->get_turn() ? -board->tpt[board->game.zobrist].eval : board->tpt[board->game.zobrist].eval;
-        value = board->tpt[board->game.zobrist].eval;
-      } else {
-        value = -search( -beta, -max, depth -1, ply + 1 );
-        board->set_tpt(board->game.zobrist, depth -1, value);
+        value[cdepth] = -SCORE_MAX;
+      }else if (useTpt) {
+        if (tpt.count(board->game.zobrist) != 0 && tpt[board->game.zobrist].depth >= depth - 1) {
+          value[cdepth] = tpt[board->game.zobrist].eval;
+        } else {
+          depthed[cdepth] = cdepth;
+          if ( (depth-1) == 0 && MOVE_CAPTURE( legal_moves[ cdepth ][ imove[ cdepth ] ]) ) {
+            value[ cdepth ] = -search( -beta, -max[ cdepth ], depth, ply + 1, &depthed[ cdepth ] );
+          } else {
+            value[cdepth] = -search( -beta, -max[cdepth], depth -1, ply + 1, &depthed[cdepth] );
+          }
+          set_tpt(board->game.zobrist, depth -1, value[cdepth]);
+        }
+      }else {
+        depthed[cdepth] = cdepth;
+        if ( (depth-1) == 0 && MOVE_CAPTURE( legal_moves[ cdepth ][ imove[ cdepth ] ]) ) {
+          value[ cdepth ] = -search( -beta, -max[ cdepth ], depth, ply + 1, &depthed[ cdepth ] );
+        } else {
+          value[cdepth] = -search( -beta, -max[cdepth], depth -1, ply + 1, &depthed[cdepth] );
+        }
       }
-      */
-      value = -search( -beta, -max, depth -1, ply + 1 );
       board->unmake_move();
 
-      if( value >= beta )
+      if( value[cdepth] >= beta )
         {
-          return value;
+          *_depthed = depthed[cdepth];
+          return value[cdepth];
         }
-      if( value > max )
+      if( value[cdepth] > max[cdepth] )
         {
-          max = value;
+          max[cdepth] = value[cdepth];
+          maxDepth[cdepth] = depthed[cdepth];
         }
 
     }
 
-  return max;
+  *_depthed = maxDepth[cdepth];
+
+  return max[cdepth];
 }
 
-short Search::evaluate()
+inline short Search::evaluate()
 {
   int score = 0;
 
-  score += ( board->popuCount( w_pawn )       - board->popuCount( b_pawn ) )       * 100;
-  score += ( board->popuCount( w_silver )     - board->popuCount( b_silver ) )     * 300;
-  score += ( board->popuCount( w_gold )       - board->popuCount( b_gold ) )       * 350;
-  score += ( board->popuCount( w_bishop )     - board->popuCount( b_bishop ) )     * 350;
-  score += ( board->popuCount( w_rook )       - board->popuCount( b_rook ) )       * 400;
-  score += ( board->popuCount( w_pro_pawn )   - board->popuCount( b_pro_pawn ) )   * 200;
-  score += ( board->popuCount( w_pro_silver ) - board->popuCount( b_pro_silver ) ) * 350;
-  score += ( board->popuCount( w_horse )      - board->popuCount( b_horse ) )      * 450;
-  score += ( board->popuCount( w_dragon )     - board->popuCount( b_dragon ) )     * 500;
+  score += ( board->popuCount( w_pawn )       - board->popuCount( b_pawn ) )       * pawnScore;
+  score += ( board->popuCount( w_silver )     - board->popuCount( b_silver ) )     * silverScore;
+  score += ( board->popuCount( w_gold )       - board->popuCount( b_gold ) )       * goldScore;
+  score += ( board->popuCount( w_bishop )     - board->popuCount( b_bishop ) )     * bishopScore;
+  score += ( board->popuCount( w_rook )       - board->popuCount( b_rook ) )       * rookScore;
+  score += ( board->popuCount( w_pro_pawn )   - board->popuCount( b_pro_pawn ) )   * proPawnScore;
+  score += ( board->popuCount( w_pro_silver ) - board->popuCount( b_pro_silver ) ) * proSilverScore;
+  score += ( board->popuCount( w_horse )      - board->popuCount( b_horse ) )      * horseScore;
+  score += ( board->popuCount( w_dragon )     - board->popuCount( b_dragon ) )     * dragonScore;
 
-  score += ( board->w_hand( pawn )   - board->b_hand( pawn ) )   * 100;
-  score += ( board->w_hand( silver ) - board->b_hand( silver ) ) * 280;
-  score += ( board->w_hand( gold )   - board->b_hand( gold ) )   * 370;
-  score += ( board->w_hand( bishop ) - board->b_hand( bishop ) ) * 340;
-  score += ( board->w_hand( rook )   - board->b_hand( rook ) )   * 390;
+  score += ( board->w_hand( pawn )   - board->b_hand( pawn ) )   * handPawnScore;
+  score += ( board->w_hand( silver ) - board->b_hand( silver ) ) * handSilverScore;
+  score += ( board->w_hand( gold )   - board->b_hand( gold ) )   * handGoldScore;
+  score += ( board->w_hand( bishop ) - board->b_hand( bishop ) ) * handBishopScore;
+  score += ( board->w_hand( rook )   - board->b_hand( rook ) )   * handRookScore;
 
-  return board->get_turn() ? -score: score;
+  return board->game.turn ? -score: score;
 }
 
 
@@ -187,4 +238,62 @@ inline void move_ordering(short *evals, unsigned int *legal_moves, unsigned int 
       legal_moves[j] = tmp_l;
     }
   }
+}
+
+inline int Search::is_conti_search() {
+  if (MOVE_CAPTURE(board->history[board->game.n_ply].move)){
+    return 1;
+  }
+  return 0;
+}
+
+inline void Search::set_tpt(unsigned long long hash, int depth, short eval) {
+  if ( tpt.size() < TPT_SIZE_MAX && depth > 1) {
+    tpt_v new_val = { depth, eval};
+    tpt[hash] = new_val;
+    //std::cout << "tpt_size: " << tpt.size() << std::endl;
+  }
+}
+void Search::print_tpt(){
+  auto itr = tpt.begin();
+  while(itr != tpt.end()){
+    std::cout << (*itr).first << ":" << (*itr).second.eval << ":" <<  (*itr).second.depth<< std::endl;
+    ++itr;
+  }
+}
+
+std::unordered_map<unsigned long long, tpt_v>* Search::get_tpt() {
+  return &tpt;
+}
+
+void Search::write_tpt(std::string binPath) {
+  std::string tpt_bin_name = "/Tpt.bin";
+  std::string bp(binPath);
+  bp.append(tpt_bin_name);
+  std::ofstream ofs(bp.c_str(), std::ios_base::out | std::ios_base::binary);
+  if (ofs) {
+    auto itr = tpt.begin();
+    while(itr != tpt.end()){
+      ofs.write(reinterpret_cast<const char *>(&(*itr).first), sizeof((*itr).first));
+      ofs.write(reinterpret_cast<const char *>(&(*itr).second), sizeof((*itr).second));
+      ++itr;
+    }
+  }
+  ofs.close();
+}
+
+void Search::read_tpt(std::string binPath) {
+  std::string tpt_bin_name = "/Tpt.bin";
+  std::string bp(binPath);
+  bp.append(tpt_bin_name);
+  std::ifstream ifs(bp.c_str() ,std::ios_base::in | std::ios_base::binary);
+  if (ifs) {
+    std::pair<unsigned long long, tpt_v> tptv;
+    while(!ifs.eof()){
+      ifs.read(reinterpret_cast<char *>(&(tptv.first)), sizeof(tptv.first));
+      ifs.read(reinterpret_cast<char *>(&(tptv.second)), sizeof(tptv.second));
+      tpt.insert(tptv);
+    }
+  }
+  ifs.close();
 }
