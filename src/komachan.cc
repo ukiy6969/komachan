@@ -76,7 +76,7 @@ class Komachan : public Nan::ObjectWrap {
       if (Nan::Has(startObj, useTptStr).FromJust() ) {
         int useTpt = Nan::To<int32_t>(Nan::Get(startObj, useTptStr).ToLocalChecked()).FromJust();
         obj->game.get_search()->useTpt = useTpt;
-        obj->game.read_tpt();
+        obj->game.get_search()->print_tpt();
       }
       v8::Local<v8::String> searchDepthStr = Nan::New<v8::String>("searchDepth").ToLocalChecked();
       if (Nan::Has(startObj, searchDepthStr).FromJust() ) {
@@ -141,6 +141,7 @@ class Komachan : public Nan::ObjectWrap {
         }
 
         obj->game.get_board()->zobrist_check();
+        obj->game.get_board()->clear_game();
       }
 
     }

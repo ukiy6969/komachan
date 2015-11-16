@@ -4,6 +4,14 @@
 #include <string.h>
 #include <assert.h>
 
+// トランスポジションのバリュー
+typedef struct _tpt_v
+{
+  int depth;     // 探索の深さ
+  char turn;
+  short eval;             // 評価値
+} tpt_v;
+
 class Search {
 private:
   static const int SCORE_MAX = 8100;
@@ -50,7 +58,7 @@ public:
   int search(short alpha, short beta, int depth, int ply, int *_depthed);
   short evaluate();
   int is_conti_search();
-  void set_tpt(unsigned long long key, int depth, short value);
+  void set_tpt(unsigned long long key, int depth, char turn, short value);
   std::unordered_map<unsigned long long, tpt_v>* get_tpt();
   void print_tpt();
   void write_tpt(std::string binPath);
