@@ -36,12 +36,6 @@ typedef struct
   unsigned long long zobrist;
 } hist_t;
 
-// トランスポジションのバリュー
-typedef struct _tpt_v
-{
-  int depth;     // 探索の深さ
-  short eval;             // 評価値
-} tpt_v;
 
 //gameに，ゲームの全状態を格納しておく。
 //historyは，指し手の配列。これまでの手を登録する?

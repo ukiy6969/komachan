@@ -92,18 +92,21 @@ double Search::search_root()
         board->make_move( legal_moves[ 0 ][ imove ] );
         if (board->get_board_show_cnt() >= 4) {
           value = -SCORE_MAX;
-        } else if (useTpt) {
-          if (tpt.count(board->game.zobrist) != 0 && tpt[board->game.zobrist].depth >= d - 1) {
+        }
+        /*
+        else if (useTpt) {
+          if (tpt.count(board->game.zobrist) != 0 && tpt[board->game.zobrist].depth == d - 1) {
             value = tpt[board->game.zobrist].eval;
           } else {
             depthed = 0;
             value = -search( -beta, -max, d -1, 1, &depthed );
-            set_tpt(board->game.zobrist, d-1, value);
+            set_tpt(board->game.zobrist, d-1, board->game.turn, value);
           }
-        } else {
+        }
+        */
+        else {
           depthed = 0;
           value = -search( -beta, -max, d -1, 1, &depthed);
-          //std::cout << "search root depth" << depthed << std::endl;
         }
         evals[imove] = value;
         board->unmake_move();
@@ -156,7 +159,6 @@ inline int Search::search( short alpha, short beta, int depth, int ply, int* _de
       return evaluate();
     }
 
-  //unsigned int legalmoves[ SIZE_LEGALMOVES ];
   nmove[cdepth] = board->gen_legalmoves( legal_moves[ cdepth ] );
 
   if( nmove[cdepth] == 0 ) {
@@ -178,8 +180,8 @@ inline int Search::search( short alpha, short beta, int depth, int ply, int* _de
             value[ cdepth ] = -search( -beta, -max[ cdepth ], depth, ply + 1, &depthed[ cdepth ] );
           } else {
             value[cdepth] = -search( -beta, -max[cdepth], depth -1, ply + 1, &depthed[cdepth] );
-          }
-          set_tpt(board->game.zobrist, depth -1, value[cdepth]);
+            set_tpt(board->game.zobrist, depth-1, board->game.turn, value[cdepth]);
+         }
         }
       }else {
         depthed[cdepth] = cdepth;
@@ -270,11 +272,10 @@ inline int Search::is_conti_search() {
   return 0;
 }
 
-inline void Search::set_tpt(unsigned long long hash, int depth, short eval) {
-  if ( tpt.size() < TPT_SIZE_MAX && depth > 1) {
-    tpt_v new_val = { depth, eval};
+inline void Search::set_tpt(unsigned long long hash, int depth, char turn, short eval) {
+  if ( /*tpt.size() < TPT_SIZE_MAX &&*/ depth > 5) {
+    tpt_v new_val = { depth, turn, eval};
     tpt[hash] = new_val;
-    //std::cout << "tpt_size: " << tpt.size() << std::endl;
   }
 }
 void Search::print_tpt(){
