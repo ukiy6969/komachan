@@ -1,27 +1,40 @@
 #include "search.h"
 
-Search::Search(Board* b){
+Search::Search(Board* b):
+  pawnPotiScore {
+    0, 0, 0, 0, 0,
+    1, 1, 1, 1, 2,
+    1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1,
+    0, 0, 0, 0, 0
+  },
+  useTpt (0),
+  searchDepth (SEARCH_DEPTH),
+  searchMaxTime (SEARCH_MAX_TIME),
+  searchSumTime (0),
+  currentEval (0),
+  pawnScore (100),
+  silverScore (300),
+  goldScore (350),
+  bishopScore (350),
+  rookScore (400),
+  proPawnScore (200),
+  proSilverScore (350),
+  horseScore (450),
+  dragonScore (500),
+  handPawnScore (100),
+  handSilverScore (280),
+  handGoldScore (370),
+  handBishopScore (340),
+  handRookScore (390)
+{
   board = b;
-  useTpt = 0;
+  //useTpt = 0;
   searchDepth = SEARCH_DEPTH;
   searchMaxTime = SEARCH_MAX_TIME;
   searchSumTime = 0;
   currentEval = 0;
 
-  pawnScore = 100;
-  silverScore = 300;
-  goldScore = 350;
-  bishopScore = 350;
-  rookScore = 400;
-  proPawnScore = 200;
-  proSilverScore = 350;
-  horseScore = 450;
-  dragonScore = 500;
-  handPawnScore = 100;
-  handSilverScore = 280;
-  handGoldScore = 370;
-  handBishopScore = 340;
-  handRookScore = 390;
 }
 
 inline void move_ordering(short *evals, unsigned int *legal_moves, unsigned int n);
@@ -217,6 +230,16 @@ inline short Search::evaluate()
   score += ( board->w_hand( rook )   - board->b_hand( rook ) )   * handRookScore;
 
   return board->game.turn ? -score: score;
+}
+
+short Search::evaluatePosition() {
+  short score = 0;
+
+  int w_pawn_posi = FIRSTONE(board->game.BBs[w_pawn]);
+  if (board->game.BBs[ w_pawn ]) {
+    score += pawnPotiScore[ FIRSTONE( board->game.BBs[w_pawn] ) ];
+  }
+  return score;
 }
 
 

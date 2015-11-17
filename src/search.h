@@ -32,6 +32,7 @@ public:
   double searchSumTime;
   double currentEval;
 
+  // 駒に関する評価値
   short pawnScore;
   short silverScore;
   short goldScore;
@@ -46,9 +47,14 @@ public:
   short handGoldScore;
   short handBishopScore;
   short handRookScore;
+
+  // 駒の位置に関する評価値
+  short pawnPotiScore[25];
+
   double search_root();
   int search(short alpha, short beta, int depth, int ply, int *_depthed);
   short evaluate();
+  short evaluatePosition();
   int is_conti_search();
   void set_tpt(unsigned long long key, int depth, short value);
   std::unordered_map<unsigned long long, tpt_v>* get_tpt();
