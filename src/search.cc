@@ -77,7 +77,7 @@ double Search::search_root()
     for( imove = 0; imove < nmove; imove++ ) {
 
         board->make_move( legal_moves[ 0 ][ imove ] );
-        if (board->get_board_show_cnt() >= 4) {
+        if (board->get_board_show_cnt() >= 2) {
           value = -SCORE_MAX;
         }
         /*
