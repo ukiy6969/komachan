@@ -336,6 +336,7 @@ class Komachan : public Nan::ObjectWrap {
   static NAN_METHOD(End) {
     Komachan* obj = ObjectWrap::Unwrap<Komachan>(info.This());
     obj->game.game_finalize();
+    obj->io.out_record(1);
     info.GetReturnValue().SetNull();
   }
 
