@@ -2372,7 +2372,7 @@ int Board::get_board_show_cnt() {
   if (N_PLY <= 0) { return 0; }
   unsigned long long check = history[N_PLY].zobrist;
   int cnt = 0;
-  for (int i = 0; i < N_PLY ; i++) {
+  for (int i = 0; i <= N_PLY ; i++) {
     if (history[i].zobrist == check) {
       cnt++;
     }
