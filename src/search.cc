@@ -176,7 +176,7 @@ double Search::search_root()
     }
 
     if ( ((double)(clock() - start) / CLOCKS_PER_SEC) > (double)maxtime) {
-      std::cout << "time up" << std::endl;
+      //std::cout << "time up" << std::endl;
       break;
     }
 
@@ -284,7 +284,7 @@ inline int Search::evaluate()
   score += ( board->w_hand( bishop ) - board->b_hand( bishop ) ) * handBishopScore;
   score += ( board->w_hand( rook )   - board->b_hand( rook ) )   * handRookScore;
 
-  score += evaluatePosition();
+  //score += evaluatePosition();
 
   return board->game.turn ? -score: score;
 }
