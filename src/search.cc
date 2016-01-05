@@ -42,7 +42,7 @@ double Search::search_root()
   double search_time;
   short value;
   short beta, max = 0;
-  //unsigned int legalmoves[ SIZE_LEGALMOVES ];
+  Board *board1 = new Board((*board));
   short evals[ SIZE_LEGALMOVES ];
   clock_t start, end;
 
@@ -80,9 +80,8 @@ double Search::search_root()
         if (board->get_board_show_cnt() >= 2) {
           value = -SCORE_MAX;
         }
-        /*
         else if (useTpt) {
-          if (tpt.count(board->game.zobrist) != 0 && tpt[board->game.zobrist].depth == d - 1) {
+          if (tpt.count(board->game.zobrist) != 0 && tpt[board->game.zobrist].depth > d - 1) {
             value = tpt[board->game.zobrist].eval;
           } else {
             depthed = 0;
@@ -90,7 +89,6 @@ double Search::search_root()
             set_tpt(board->game.zobrist, d-1, board->game.turn, value);
           }
         }
-        */
         else {
           depthed = 0;
           value = -search( -beta, -max, d -1, 1, &depthed);
@@ -250,7 +248,7 @@ inline int Search::is_conti_search() {
 }
 
 inline void Search::set_tpt(unsigned long long hash, int depth, char turn, short eval) {
-  if ( /*tpt.size() < TPT_SIZE_MAX &&*/ depth > 5) {
+  if ( /*tpt.size() < TPT_SIZE_MAX &&*/ depth > 1) {
     tpt_v new_val = { depth, turn, eval};
     tpt[hash] = new_val;
   }
