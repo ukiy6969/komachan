@@ -478,7 +478,6 @@ void Io::out_board(){
   out("get_zobrist_hash=%llu\n", board->get_zobrist() );
   out("show_board_cnt=%d\n", board->get_board_show_cnt() );
   out("search_sum_time=%f\n", game->get_search()->searchSumTime );
-  //print_tpt();
   out("\n\n");
 
   return;

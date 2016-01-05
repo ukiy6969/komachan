@@ -1,30 +1,93 @@
 #include "search.h"
 
-Search::Search(Board* b){
+Search::Search(Board* b):
+  pawnPosiScore {
+    0, 0, 0, 0, 0,
+    1, 1, 1, 1, 2,
+    1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1,
+    0, 0, 0, 0, 0
+  },
+  silverPosiScore {
+    0, 0, 0, 0, 0,
+    1, 2, 2, 2, 1,
+    1, 2, 3, 2, 1,
+    1, 2, 2, 2, 1,
+    1, 1, 1, 1, 1
+  },
+  goldPosiScore {
+    1, 1, 1, 2, 0,
+    1, 2, 2, 3, 2,
+    1, 2, 3, 2, 1,
+    1, 2, 2, 2, 1,
+    0, 2, 1, 1, 1
+  },
+  bishopPosiScore {
+    0, 0, 0, 1, 2,
+    0, 2, 2, 1, 1,
+    0, 2, 3, 2, 0,
+    0, 1, 2, 2, 0,
+    2, 1, 1, 1, 1
+  },
+  rookPosiScore {
+    2, 2, 2, 2, 1,
+    2, 1, 2, 2, 2,
+    2, 1, 1, 2, 2,
+    2, 1, 1, 1, 2,
+    1, 2, 2, 2, 2
+  },
+  proPawnPosiScore {
+    1, 1, 1, 2, 2,
+    1, 2, 2, 3, 2,
+    1, 2, 2, 2, 1,
+    1, 2, 2, 2, 1,
+    1, 1, 1, 1, 1
+  },
+  proSilverPosiScore {
+    1, 2, 2, 2, 2,
+    1, 2, 2, 2, 2,
+    1, 2, 3, 2, 2,
+    1, 2, 2, 2, 2,
+    1, 1, 1, 1, 1
+  },
+  horsePosiScore {
+    1, 1, 1, 1, 1,
+    1, 2, 2, 2, 1,
+    1, 2, 3, 2, 1,
+    1, 2, 2, 2, 1,
+    1, 1, 1, 1, 1
+  },
+  dragonPosiScore {
+    2, 2, 2, 2, 3,
+    1, 2, 2, 2, 2,
+    1, 2, 3, 2, 2,
+    1, 2, 2, 2, 2,
+    1, 1, 1, 1, 2
+  },
+  useTpt (0),
+  searchDepth (SEARCH_DEPTH),
+  searchMaxTime (SEARCH_MAX_TIME),
+  searchSumTime (0),
+  currentEval (0),
+  pawnScore (100),
+  silverScore (300),
+  goldScore (350),
+  bishopScore (350),
+  rookScore (400),
+  proPawnScore (200),
+  proSilverScore (350),
+  horseScore (450),
+  dragonScore (500),
+  handPawnScore (100),
+  handSilverScore (280),
+  handGoldScore (370),
+  handBishopScore (340),
+  handRookScore (390)
+{
   board = b;
-  useTpt = 0;
-  searchDepth = SEARCH_DEPTH;
-  searchMaxTime = SEARCH_MAX_TIME;
-  searchSumTime = 0;
-  currentEval = 0;
-
-  pawnScore = 100;
-  silverScore = 300;
-  goldScore = 350;
-  bishopScore = 350;
-  rookScore = 400;
-  proPawnScore = 200;
-  proSilverScore = 350;
-  horseScore = 450;
-  dragonScore = 500;
-  handPawnScore = 100;
-  handSilverScore = 280;
-  handGoldScore = 370;
-  handBishopScore = 340;
-  handRookScore = 390;
 }
 
-inline void move_ordering(short *evals, unsigned int *legal_moves, unsigned int n);
+inline void move_ordering(int *evals, unsigned int *legal_moves, unsigned int n);
 
 double Search::search_root()
 {
@@ -40,10 +103,10 @@ double Search::search_root()
   int d;
   double maxtime = searchMaxTime;
   double search_time;
-  short value;
-  short beta, max = 0;
+  int value;
+  int beta, max = 0;
   //unsigned int legalmoves[ SIZE_LEGALMOVES ];
-  short evals[ SIZE_LEGALMOVES ];
+  int evals[ SIZE_LEGALMOVES ];
   clock_t start, end;
 
   nmove = board->gen_legalmoves( legal_moves[0] );
@@ -70,6 +133,9 @@ double Search::search_root()
 
   for(d = 2; d <= depth; d++  ){
     //std::cout << "depth: " << d << std::endl;
+    if (nmove <= 1) {
+      break;
+    }
 
     best = 0;
     max   = -SCORE_MAX;
@@ -80,17 +146,16 @@ double Search::search_root()
         if (board->get_board_show_cnt() >= 2) {
           value = -SCORE_MAX;
         }
-        /*
         else if (useTpt) {
-          if (tpt.count(board->game.zobrist) != 0 && tpt[board->game.zobrist].depth == d - 1) {
+          if (tpt.count(board->game.zobrist) != 0 && tpt[board->game.zobrist].depth > d) {
             value = tpt[board->game.zobrist].eval;
+            assert ( board->get_turn() == tpt[board->game.zobrist].turn );
           } else {
             depthed = 0;
             value = -search( -beta, -max, d -1, 1, &depthed );
             set_tpt(board->game.zobrist, d-1, board->game.turn, value);
           }
         }
-        */
         else {
           depthed = 0;
           value = -search( -beta, -max, d -1, 1, &depthed);
@@ -111,7 +176,7 @@ double Search::search_root()
     }
 
     if ( ((double)(clock() - start) / CLOCKS_PER_SEC) > (double)maxtime) {
-      std::cout << "time up" << std::endl;
+      //std::cout << "time up" << std::endl;
       break;
     }
 
@@ -128,7 +193,7 @@ double Search::search_root()
   return search_time;
 }
 
-inline int Search::search( short alpha, short beta, int depth, int ply, int* _depthed)
+inline int Search::search( int alpha, int beta, int depth, int ply, int* _depthed)
 {
   const int cdepth = 1 + (*_depthed);
   imove[ cdepth] = 0;
@@ -156,11 +221,12 @@ inline int Search::search( short alpha, short beta, int depth, int ply, int* _de
   for( imove[cdepth] = 0; imove[cdepth] < nmove[cdepth]; imove[cdepth]++ )
     {
       board->make_move( legal_moves[ cdepth ][ imove[cdepth] ] );
-      if (board->get_board_show_cnt() >= 4) {
+      if (board->get_board_show_cnt() >= 3) {
         value[cdepth] = -SCORE_MAX;
       }else if (useTpt) {
-        if (tpt.count(board->game.zobrist) != 0 && tpt[board->game.zobrist].depth >= depth - 1) {
+        if (tpt.count(board->game.zobrist) != 0 && tpt[board->game.zobrist].depth > depth - 1) {
           value[cdepth] = tpt[board->game.zobrist].eval;
+          assert( board->game.turn == tpt[board->game.zobrist].turn );
         } else {
           depthed[cdepth] = cdepth;
           if ( (depth-1) == 0 && MOVE_CAPTURE( legal_moves[ cdepth ][ imove[ cdepth ] ]) ) {
@@ -198,7 +264,7 @@ inline int Search::search( short alpha, short beta, int depth, int ply, int* _de
   return max[cdepth];
 }
 
-inline short Search::evaluate()
+inline int Search::evaluate()
 {
   int score = 0;
 
@@ -218,13 +284,102 @@ inline short Search::evaluate()
   score += ( board->w_hand( bishop ) - board->b_hand( bishop ) ) * handBishopScore;
   score += ( board->w_hand( rook )   - board->b_hand( rook ) )   * handRookScore;
 
+  //score += evaluatePosition();
+
   return board->game.turn ? -score: score;
 }
 
+inline int Search::evaluatePosition() {
+  int score = 0;
 
-inline void move_ordering(short *evals, unsigned int *legal_moves, unsigned int n) {
+  if (board->game.BBs[ w_pawn ]) {
+    assert( FIRSTONE( board->game.BBs[w_pawn] ) < 25);
+    score += pawnPosiScore[ FIRSTONE( board->game.BBs[w_pawn] ) ];
+  }
+  if (board->game.BBs[ b_pawn ]){
+    assert( FIRSTONE( board->game.BBs[b_pawn] ) < 25);
+    score -= pawnPosiScore[24 - FIRSTONE( board->game.BBs[b_pawn] ) ];
+  }
+
+  if (board->game.BBs[ w_silver ]) {
+    assert( FIRSTONE( board->game.BBs[w_silver] ) < 25);
+    score += silverPosiScore[ FIRSTONE( board->game.BBs[w_silver] ) ];
+  }
+  if (board->game.BBs[ b_silver ]){
+    assert( FIRSTONE( board->game.BBs[b_silver] ) < 25);
+    score -= silverPosiScore[24 - FIRSTONE( board->game.BBs[b_silver] ) ];
+  }
+
+  if (board->game.BBs[ w_gold ]) {
+    assert( FIRSTONE( board->game.BBs[w_gold] ) < 25);
+    score += goldPosiScore[ FIRSTONE( board->game.BBs[w_gold] ) ];
+  }
+  if (board->game.BBs[ b_gold ]){
+    assert( FIRSTONE( board->game.BBs[b_gold] ) < 25);
+    score -= goldPosiScore[24 -  FIRSTONE( board->game.BBs[b_gold] ) ];
+  }
+
+  if (board->game.BBs[ w_bishop ]) {
+    assert( FIRSTONE( board->game.BBs[w_bishop] ) < 25);
+    score += bishopPosiScore[ FIRSTONE( board->game.BBs[w_bishop] ) ];
+  }
+  if (board->game.BBs[ b_bishop ]){
+    assert( FIRSTONE( board->game.BBs[b_bishop] ) < 25);
+    score -= bishopPosiScore[24 - FIRSTONE( board->game.BBs[b_bishop] ) ];
+  }
+
+  if (board->game.BBs[ w_rook ]) {
+    assert( FIRSTONE( board->game.BBs[w_rook] ) < 25);
+    score += rookPosiScore[ FIRSTONE( board->game.BBs[w_rook] ) ];
+  }
+  if (board->game.BBs[ b_rook ]){
+    assert( FIRSTONE( board->game.BBs[b_rook] ) < 25);
+    score -= rookPosiScore[24 - FIRSTONE( board->game.BBs[b_rook] ) ];
+  }
+
+  if (board->game.BBs[ w_pro_pawn ]) {
+    assert( FIRSTONE( board->game.BBs[w_pro_pawn] ) < 25);
+    score += proPawnPosiScore[ FIRSTONE( board->game.BBs[w_pro_pawn] ) ];
+  }
+  if (board->game.BBs[ b_pro_pawn ]){
+    assert( FIRSTONE( board->game.BBs[b_pro_pawn] ) < 25);
+    score -= proPawnPosiScore[24 - FIRSTONE( board->game.BBs[b_pro_pawn] ) ];
+  }
+
+  if (board->game.BBs[ w_pro_silver ]) {
+    assert( FIRSTONE( board->game.BBs[w_pro_silver] ) < 25);
+    score += proSilverPosiScore[ FIRSTONE( board->game.BBs[w_pro_silver] ) ];
+  }
+  if (board->game.BBs[ b_pro_silver ]){
+    assert( FIRSTONE( board->game.BBs[b_pro_silver] ) < 25);
+    score -= proSilverPosiScore[24 - FIRSTONE( board->game.BBs[b_pro_silver] ) ];
+  }
+
+  if (board->game.BBs[ w_horse ]) {
+    assert( FIRSTONE( board->game.BBs[w_horse] ) < 25);
+    score += horsePosiScore[ FIRSTONE( board->game.BBs[w_horse] ) ];
+  }
+  if (board->game.BBs[ b_horse ]){
+    assert( FIRSTONE( board->game.BBs[b_horse] ) < 25);
+    score -= horsePosiScore[24 - FIRSTONE( board->game.BBs[b_horse] ) ];
+  }
+
+  if (board->game.BBs[ w_dragon ]) {
+    assert( FIRSTONE( board->game.BBs[w_dragon] ) < 25);
+    score += dragonPosiScore[ FIRSTONE( board->game.BBs[w_dragon] ) ];
+  }
+  if (board->game.BBs[ b_dragon ]){
+    assert( FIRSTONE( board->game.BBs[b_dragon] ) < 25);
+    score -= dragonPosiScore[24 - FIRSTONE( board->game.BBs[b_dragon] ) ];
+  }
+
+  return score;
+}
+
+
+inline void move_ordering(int *evals, unsigned int *legal_moves, unsigned int n) {
   /** insert sort **/
-  short tmp_e;
+  int tmp_e;
   unsigned int i, j, tmp_l;
   for (i = 1; i < n; i++) {
     tmp_e = evals[i];
@@ -249,8 +404,8 @@ inline int Search::is_conti_search() {
   return 0;
 }
 
-inline void Search::set_tpt(unsigned long long hash, int depth, char turn, short eval) {
-  if ( /*tpt.size() < TPT_SIZE_MAX &&*/ depth > 5) {
+inline void Search::set_tpt(unsigned long long hash, int depth, char turn, int eval) {
+  if ( /*tpt.size() < TPT_SIZE_MAX &&*/ depth > 3) {
     tpt_v new_val = { depth, turn, eval};
     tpt[hash] = new_val;
   }

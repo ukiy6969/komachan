@@ -232,7 +232,9 @@ inline void Board::update_zobrist(unsigned long long u){
 unsigned long long Board::get_zobrist() {
   int index = 0, type = 0;
 
-  unsigned long long res = TURN_RAND[(int) TURN ];
+  unsigned long long res = 0;
+
+  res ^= TURN_RAND[(int) TURN ];
 
   for( int i=0; i<5; i++ ) {
     for( int j=0; j<5; j++ ) {
